@@ -82,24 +82,24 @@ def reachprofile(data, setting, max_velocity):
 
     #ReachProfile/ draw
 
-    target = patches.Circle(data['Targets'][0], radius=0.5, color='g', fill=True)
-    max_velocity = patches.Circle(max_position, radius=0.2, color='b', fill=True)
-    circ = patches.Circle(data['Targets'][0], radius=1, color='g', fill=True)
+    target = patches.Circle(data['Targets'][0], radius=0.02, color='g', fill=True)
+    max_velocity = patches.Circle(max_position, radius=0.02, color='b', fill=True)
+    circ = patches.Circle(data['Targets'][0], radius=0.02, color='g', fill=True)
     fig2 = plt.figure(facecolor='gray', edgecolor='b')
     ax = fig2.add_subplot(111)
     ax.set_aspect('equal')
     if setting['Display Origin'] == ['', '']:
-        DEFAULT_DISPRANGE = [10, 10]
+        DEFAULT_DISPRANGE = [20, 20]
         disprange = [int(tup) for tup in DEFAULT_DISPRANGE]
         disprange = [0, 0]
     else:
         disprange = [int(tup) for tup in setting['Display Scale']]
 
     if disprange[0] == 0:
-        xleft = -5
-        xright = 5
-        ydown = -20
-        yup = 10
+        xleft = -0.2
+        xright = 0.2
+        ydown = -0.2
+        yup = 0.2
     else:
         xleft = -(disprange[0]/2)
         xright = (disprange[0]/2)
