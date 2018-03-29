@@ -7,4 +7,5 @@ Dependencies:
 - numpy
 - scipy
 - pandas
+- matplotlib
 - wxpython
