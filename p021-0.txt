@@ -1,4 +1,4 @@
-trial	time	cursorx	cursory	hand_x	hand_Y	rotation	step	targetangle	targetposx	targetposy	garagelocation	garageposx	garageposy	homex	homey	group	trial_type
+time	trial	cursorx	cursory	hand_x	hand_Y	rotation	step	targetangle	targetposx	targetposy	garagelocation	garageposx	garageposy	homex	homey	group	trial_type
 1	0	0.38205	-6.8528	0.38205	-6.8528	0	5	90	7.3479e-16	4.6562	-1	-9	3.6562	0	-7.3438	1	1
 1	25.086	0.18097	-7.464	0.18097	-7.464	0	1	90	7.3479e-16	4.6562	-1	-9	3.6562	0	-7.3438	1	1
 1	41.599	0.16086	-7.4962	0.16086	-7.4962	0	1	90	7.3479e-16	4.6562	-1	-9	3.6562	0	-7.3438	1	1

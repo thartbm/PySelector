@@ -1,16 +1,18 @@
-import wx,sys,os
+import wx, sys, os
 from wx import *
 import matplotlib
+import numpy as np
+import pandas as pd
+
 matplotlib.use('WXAgg')
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_wxagg import FigureCanvasWxAgg as FigureCanvas
 from gui import settingwindow
 import wx.lib.agw.gradientbutton as gbtn
 from database.database import get_experiment as exp
-from database.database import Experiment
+from database.Read_Data import set_data
+from database.Plot_Data import velocity_profiler, reach_profiler
 from gui import settingwindow
-
-__experiment__ = None
 
 
 class MyApp(wx.App):
@@ -30,22 +32,17 @@ class MyFrame(wx.Frame):
         self.MainPanel = MainPanel(self)
         self.PopupMenu = PopupMenu(self)
 
-
         # Local Variables
         icon_path = './gui/icons/appicon.png'
-        icon = wx.Icon(icon_path , wx.BITMAP_TYPE_PNG)
-
+        icon = wx.Icon(icon_path, wx.BITMAP_TYPE_PNG)
 
         # Actions
         self.SetMenuBar(self.PopupMenu)
         self.SetIcon(icon)
 
+        # self.SetSizerAndFit(self.MainPanel.Sizer, wx.GROW)
 
-        #self.SetSizerAndFit(self.MainPanel.Sizer, wx.GROW)
-
-        #wx.CallAfter(self.setframesize)
-
-
+        # wx.CallAfter(self.setframesize)
 
     def setframesize(self):
         MinSizeX, MinSizeY = self.MainPanel.Sizer.GetMinSize()
@@ -55,9 +52,15 @@ class MyFrame(wx.Frame):
     def set_settings(self, exp_name):
         self.MainPanel.set_settings(exp_name)
 
-
     def set_exp(self, setting_name):
         self.MainPanel.set_exp(setting_name)
+
+
+
+
+
+
+
 
 class MainPanel(wx.Panel):
     def __init__(self, parent):
@@ -67,36 +70,30 @@ class MainPanel(wx.Panel):
         self.ButtonPanel = ButtonPanel(self)
         self.Fixp1p2 = False
         self.clicknum = 1
+        self.selected_velocity = 'pyselect'
         self.warningmsg = wx.MessageDialog(self, 'Please Choose Settings first', caption=MessageBoxCaptionStr,
                                            style=OK | CENTRE, pos=DefaultPosition)
-
         self.__setpanel()
         self.__dolayout()
+        self.Bind(wx.EVT_KEY_DOWN, self.onKeyPress)
 
         # Event Handlers
-        self.Bind(wx.EVT_LIST_ITEM_SELECTED,
-                  self.OnItemSelected)
+        # self.Bind(wx.EVT_LIST_ITEM_SELECTED,
+        #          self.OnItemSelected)
 
         self.VelocityCanvas.mpl_connect('button_press_event',
-                  self.onVelcoityclick)
-
+                                        self.onVelcoityclick)
 
     def __setpanel(self):
         self.InfoPanel = InfoPanel(self)
         self.__setreachplot()
         self.__setvelocityplot()
 
-    def refresh(self):
-        self.__updatereachplot()
-        self.__updatevelocityplot()
-        self.InfoPanel.update()
-        self.Layout()
-
     def __dolayout(self):
-        MainPanelSizer = wx.GridBagSizer(10,10)
+        MainPanelSizer = wx.GridBagSizer(10, 10)
         MainPanelSizer.Add(self.ReachCanvas, pos=(0, 1), span=(1, 1), flag=wx.GROW)
         MainPanelSizer.Add(self.VelocityCanvas, pos=(1, 1), span=(1, 1), flag=wx.GROW)
-        MainPanelSizer.Add(self.InfoPanel, pos=(0, 0), span=(1,1), flag=wx.ALIGN_CENTRE | wx.GROW)
+        MainPanelSizer.Add(self.InfoPanel, pos=(0, 0), span=(1, 1), flag=wx.ALIGN_CENTRE | wx.GROW)
         MainPanelSizer.Add(self.ButtonPanel, pos=(1, 0), flag=wx.ALIGN_CENTRE | wx.GROW)
         MainPanelSizer.AddGrowableRow(0, 3)
         MainPanelSizer.AddGrowableCol(1, 1)
@@ -115,65 +112,119 @@ class MainPanel(wx.Panel):
         plt.axis([0, 1, 0, 1])
         self.VelocityCanvas = FigureCanvas(self, -1, fig)
         self.VelocityCanvas.SetMinSize((100, 100))
-        self.VelocityCanvas.draw()
+        #self.VelocityCanvas.draw()
 
     def __updatereachplot(self):
-        CurrentTrial = __experiment__.CurrentTrial
-        fig = CurrentTrial.reachplot
+        # this is somewhat prone to errors, it should be fine as long as the program consistnaly runs velocity plots
+        # before reach plots though as it does now.
+        fig = reach_profiler(self.trial_data, self.setting, self.max_position, self.trial_data['max_velocity'])
         self.ReachCanvas.figure = fig
-        self.ReachCanvas.draw()
+        #self.ReachCanvas.draw()
 
     def __updatevelocityplot(self):
-        CurrentTrial = __experiment__.CurrentTrial
-        fig = CurrentTrial.VelocityPlot
-        self.VelocityCanvas.figure = fig
+        if self.Fixp1p2:
+            self.VelocityCanvas.figure.get_axes()[0].get_children()[2].set_xdata(self.trial_data['P1'])
+            self.VelocityCanvas.figure.get_axes()[0].get_children()[3].set_xdata(self.trial_data['P2'])
+            self.Fixp1p2 = False
+        else:
+            if self.selected_velocity is 'pyselect':  # will always happen first.
+                [fig, self.trial_data['P1'], self.trial_data['P2'], self.max_position, self.trial_data['max_velocity']] \
+                    = velocity_profiler(self.trial_data, self.selected_velocity)
+                self.VelocityCanvas.figure = fig
+            elif self.selected_velocity is 'user':
+                # maybe do this differently (outsource to a function?) . Consider this later.
+                self.VelocityCanvas.figure.get_axes()[0].get_children()[1].set_xdata(self.trial_data['max_velocity'])
+                self.selected_velocity = 'pyselect'
+
         self.VelocityCanvas.draw()
 
-    def OnItemSelected(self, event):
-        selected_row = event.GetIndex()
-        __experiment__.CurrentTrialNum = self.InfoPanel.GetItemText(selected_row)
-        self.refresh()
+    # def OnItemSelected(self, event):
+    #    selected_row = event.GetIndex()
+    #    __experiment__.CurrentTrialNum = self.InfoPanel.GetItemText(selected_row)
+    #    self.refresh()
 
     def onVelcoityclick(self, event):
         if self.Fixp1p2:
             self.fixp1p2(event)
         else:
-            __experiment__.CurrentTrial.MaxVelocity = event.xdata
+            self.selected_velocity = 'user'
+            self.trial_data['max_velocity'] = event.xdata
             self.refresh()
-
-
 
     def fixp1p2(self, event):
         if self.clicknum == 1:
-            __experiment__.CurrentTrial.p1 = event.xdata
+            self.trial_data['P1'] = event.xdata
             self.clicknum = 2
         elif self.clicknum == 2:
-            __experiment__.CurrentTrial.p2 = event.xdata
-            self.Fixp1p2 = False
+            self.trial_data['P2'] = event.xdata
             self.clicknum = 1
             self.refresh()
-
 
     def set_settings(self, setting_name):
         self.InfoPanel.set_settings(setting_name)
 
     def set_exp(self, exp_name):
-        if self.InfoPanel.setting.GetLabel() ==  'None':
+        if self.InfoPanel.setting.GetLabel() == 'None':
             self.warningmsg.ShowModal()
 
         else:
-            self.InfoPanel.set_exp(exp_name)
+            self.experiment, self.setting = set_data(exp_name, self.InfoPanel.setting.GetLabel())
+            self.InfoPanel.set_exp(exp_name, self.experiment)
 
+    def set_trial_data(self, trial):
+        self.trial_data = self.experiment['Trial'][trial]
+        self.refresh()
+
+    def refresh(self):
+        self.__updatevelocityplot()
+        self.__updatereachplot()
+        self.InfoPanel.update()
+        self.Layout()
+
+    def updateoutput(self):
+        #this will be a lot nicer once we actually have segments defined
+        self.setting['Segments'][0] = 0
+        self.setting['Segments'][1]  = 1
+        output = self.experiment['output'][(self.experiment['output'].trial == self.InfoPanel.current_trial)
+                              & (self.experiment['output'].step >= int(self.setting['Segments'][0]))
+                              & (self.experiment['output'].step <= int(self.setting['Segments'][1]))]
+        cond = (self.experiment['output'].trial == self.InfoPanel.current_trial)\
+                              & (self.experiment['output'].step >= int(self.setting['Segments'][0]))\
+                              & (self.experiment['output'].step <= int(self.setting['Segments'][1]))
+        output.accept = self.trial_data['Accept']
+        output.unsure = self.trial_data['Unsure']
+
+        maxvel_idx = next(x[0] for x in enumerate(self.trial_data['Time']) if x[1] >= self.trial_data['max_velocity'])
+        p1_idx = next(x[0] for x in enumerate(self.trial_data['Time']) if x[1] >= self.trial_data['P1'])
+        p2_idx = next(x[0] for x in enumerate(self.trial_data['Time']) if x[1] >= self.trial_data['P2'])
+
+        output['max_velocity'].iloc[maxvel_idx] = 1
+        output['p1'].iloc[p1_idx] = 1
+        output['p2'].iloc[p2_idx] = 1
+        start = np.where(cond)[0][0]
+        end = np.where(cond)[0][-1]
+        self.experiment['output'].iloc[start:end, :] = output
+
+    def outputdata(self):
+        self.experiment['output'].to_csv('test.csv', sep='\t', encoding='utf-8')
+
+    def onKeyPress(self, e):
+        if e == wx.WXK_RIGHT:
+            self.MainPanel.ButtonPanel.nexttrial(e)
+        elif e == wx.WXK_LEFT:
+            self.MainPanel.ButtonPane.prvstrial(e)
+        elif e == wx.WXK_DOWN:
+            self.MainPanel.ButtonPane.savetrial(e)
 
 class InfoPanel(wx.Panel):
     def __init__(self, parent):
         super().__init__(parent=parent)
         self.parent = parent
+        self.trial_index = 0
         self.BackgroundColour = wx.RED
         self.setting = wx.StaticText(self, -1, 'None')
         self.experiment = wx.StaticText(self, -1, 'None')
         self.trial = wx.StaticText(self, -1, '0/0')
-
 
         settinglabel = wx.StaticText(self, -1, "Setting:")
         experimentlabel = wx.StaticText(self, -1, "Experiment:")
@@ -184,26 +235,38 @@ class InfoPanel(wx.Panel):
         self.SetSizerAndFit(sizer)
 
     def update(self):
-        if not __experiment__.setting is None:
-            self.setting.SetLabel(__experiment__.setting['Name'])
-        self.experiment.SetLabel(__experiment__.Address)
-        self.trial.SetLabel(str(__experiment__.CurrentTrialNum) + '/' + str(__experiment__.NumTrials))
+        self.trial.SetLabel(str(self.current_trial) + '/' + str(self.all_trials[-1]))
 
     def set_settings(self, setting_name):
-        self.setting.SetLabel(os.path.splitext(setting_name)[0])  #don't include "json"
+        self.setting.SetLabel(os.path.splitext(setting_name)[0])  # don't include "json"
         self.parent.Refresh()
 
+    def update_trial_index(self, direction):
+        if isinstance(direction, int):
+            self.trial_index = direction
+        elif direction is 'up':
+            self.trial_index +=1
+        elif direction is 'down':
+            self.trial_index -=1
 
-    def set_exp(self, experiment_path):
+        self.current_trial = self.all_trials[self.trial_index]
+        self.parent.set_trial_data(self.current_trial)
+
+
+    def set_exp(self, experiment_path, experiment):
         self.experiment.SetLabel(experiment_path)
-        self.parent.Refresh()
+        # ====  RECODE maybe? / there has to be a nicer way of handling this
+        self.current_trial = list(experiment['Trial'].keys())[self.trial_index]
+        self.all_trials = list(experiment['Trial'].keys())
+        self.trial.SetLabel(str(self.current_trial) + '/' + str(self.all_trials[-1]))
+        self.parent.set_trial_data( self.current_trial)
 
 
 class ButtonPanel(wx.Panel):
     def __init__(self, parent):
         super().__init__(parent=parent)
         self.parent = parent
-        self.Unsure = wx.CheckBox(self,  size= (100, 10), label="Unsure")
+        self.Unsure = wx.CheckBox(self, size=(100, 10), label="Unsure")
         self.Save = wx.ToggleButton(self, label="Accept")
         self.SetMax = wx.Button(self, label=" Max Velocity")
         self.Delete = wx.ToggleButton(self, label="Reject ")
@@ -214,8 +277,8 @@ class ButtonPanel(wx.Panel):
         self.gridSizer = wx.GridSizer(rows=4, cols=2, hgap=2, vgap=2)
         emptycell = (0, 0)
         self.gridSizer.AddMany([
-            (self.FixP1P2, wx.ALIGN_CENTER), (self.SetMax , wx.ALIGN_CENTER),
-            emptycell,  (self.Unsure, wx.ALIGN_LEFT),
+            (self.FixP1P2, wx.ALIGN_CENTER), (self.SetMax, wx.ALIGN_CENTER),
+            emptycell, (self.Unsure, wx.ALIGN_LEFT),
             (self.Save, wx.ALIGN_CENTER), (self.Delete, wx.ALIGN_CENTER),
             (self.Previous), (self.Next)])
 
@@ -230,30 +293,29 @@ class ButtonPanel(wx.Panel):
         self.Bind(wx.EVT_TOGGLEBUTTON, self.deltrial, self.Delete)
 
 
-    def nexttrial(self, e):
-        __experiment__.CurrentTrialNum += 1
+    def nexttrial(self,e):
+        self.parent.updateoutput()
+        self.parent.InfoPanel.update_trial_index('up')
         self.toggleoff()
-        self.parent.refresh()
+
 
     def fixp1p2(self, e):
         self.parent.Fixp1p2 = True
 
     def prvstrial(self, e):
-        __experiment__.CurrentTrialNum -= 1
+        self.parent.InfoPanel.update_trial_index('down')
         self.toggleoff()
-        self.parent.refresh()
 
     def deltrial(self, e):
-        __experiment__.del_trial = 1
-        self.parent.refresh()
+        self.parent.trial_data['Reject'] = 1
 
     def savetrial(self, e):
-        __experiment__.save_trial = 1
-        self.parent.refresh()
+        self.parent.trial_data['Accept'] = 1
 
     def unsuretrial(self, e):
-        __experiment__.unsure_trial += 1
-        self.parent.refresh()
+        self.parent.trial_data['Unsure'] = 1
+
+
 
     def toggleoff(self):
         self.Unsure.SetValue(False)
@@ -261,67 +323,60 @@ class ButtonPanel(wx.Panel):
         self.Delete.SetValue(False)
 
 
-#This is the toolbar menu at the top
+# This is the toolbar menu at the top
 class PopupMenu(wx.MenuBar):
-    def __init__(self, parent): #parent is mainframe
+    def __init__(self, parent):  # parent is mainframe
         super().__init__()
         self.parent = parent
 
-        #The two menus
+        # The two menus
         self.filemenu = wx.Menu()
         self.settingsmenu = wx.Menu()
-
-        self.savedsettings = wx.Menu() #savedsetting is a submenu of settingmenu
-        all_settings = [x for x in os.listdir('setting/savedsettings') if x.endswith(".json")]    # setings that already exist
+        self.savedsettings = wx.Menu()  # savedsetting is a submenu of settingmenu
+        all_settings = [x for x in os.listdir('setting/savedsettings') if
+                        x.endswith(".json")]  # setings that already exist
 
         for item in all_settings:
             self.savedsettings.Append(-1, item)
 
-        #settingmenu buttons
+        # settingmenu buttons
         newsetting = self.settingsmenu.Append(-1, 'New Setting')
         settingchoice = self.settingsmenu.Append(-1, 'Choose Setting...', self.savedsettings)
 
-        #filemenu buttons
+        # filemenu buttons
         loaddata = self.filemenu.Append(-1, 'load')
         writedata = self.filemenu.Append(-1, 'save')
-        #writedata_cs = filemenu.Append(-1, 'save cs')
-
+        # writedata_cs = filemenu.Append(-1, 'save cs')
 
         self.Append(self.filemenu, 'Files')
         self.Append(self.settingsmenu, 'Settings')
 
         self.filepicker = wx.FileDialog(self)
 
-
         ##Bindings
         self.Bind(EVT_MENU, self.loadsettinggui, newsetting)
-        self.Bind(EVT_MENU, self.getdata, loaddata)
         self.Bind(EVT_MENU, self.outputdata, writedata)
+        self.Bind(EVT_MENU, self.getdata, loaddata)
         self.savedsettings.Bind(wx.EVT_MENU, self.choosesetting)
-
-
-
 
     def loadsettinggui(self, e):
         win = settingwindow.SettingFrame(self)
         win.Show(True)
-#       all_settings = [x for x in os.listdir('setting/savedsettings') if x.endswith(".json")]    # setings that already exist
-#       for item in all_settings:
-#           if item not in self.savedsettings:
-#               self.savedsettings.Append(-1, item)
+
+    #       all_settings = [x for x in os.listdir('setting/savedsettings') if x.endswith(".json")]    # setings that already exist
+    #       for item in all_settings:
+    #           if item not in self.savedsettings:
+    #               self.savedsettings.Append(-1, item)
 
     def choosesetting(self, e):
         self.parent.set_settings(self.savedsettings.FindItemById(e.GetId()).GetItemLabel())
 
     def getdata(self, e):
-        global __experiment__
         self.filepicker.ShowModal()
         self.parent.set_exp(self.filepicker.GetPath())
 
-    def outputdata(self):
-        __experiment__.output()
-
-
+    def outputdata(self, e):
+        self.parent.MainPanel.outputdata()
 
 
 def run():

@@ -1,5 +1,3 @@
-#!/usr/bin/ipython
-
 from gui import mainwindow,startwindow,settingwindow
 from database import database
 

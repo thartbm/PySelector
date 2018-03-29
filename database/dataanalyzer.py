@@ -12,7 +12,7 @@ plt.ioff()
 
 
 
-def velocoityprofile(data,header):
+def velocoityprofile(data):
     #Variables
     realdata = data['Real']
     xreal = [row[0] for row in realdata]
@@ -54,27 +54,17 @@ def velocoityprofile(data,header):
     p2line = ax.axvline(p2time, color='g')
 
     plt.close()
-
-
-    return fig,velocityline,p1line,p2line,max_position
+    return fig, velocityline, p1line, p2line, max_position
 
 def reachprofile(data, header, setting, alltargets, max_position):
-
     #Variables
-
-    realdata = [row for row in data['Real']]
-    reach_start = np.where(data['Step'][2::] >= 2)
-    reach_end = np.where(data['Step'][2::] <= 3)
-    first = reach_start[0][0]
-    last = reach_end[0][-1]
-    ranges = [(n, min(n + step, stop)) for n in xrange(start, stop, step)]
-
-    realdata = realdata[0][first:last,:]
+    realdata = data['Real']
     xreal = [row[0] for row in realdata]
     yreal = [row[1] for row in realdata]
     dispdata = data['Display']
     xdisp = [row[0] for row in dispdata]
     ydisp = [row[1] for row in dispdata]
+
 
     #ReachProfile/ draw
     target = patches.Circle(data['Targets'][0], radius=0.5, color='g', fill=True)
