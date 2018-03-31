@@ -202,7 +202,7 @@ class MainPanel(wx.Panel):
         self.experiment['output'].iloc[start:end, :] = output
 
     def outputdata(self):
-        self.experiment['output'].to_csv('test.csv', sep='\t', encoding='utf-8')
+        self.experiment['output'].to_csv('test.csv',index=False)
 
     def onKeyPress(self, e):
         if e == wx.WXK_RIGHT:
