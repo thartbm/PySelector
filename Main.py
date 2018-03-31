@@ -1,5 +1,4 @@
-from gui import mainwindow,startwindow,settingwindow
-from database import database
+from gui import mainwindow
 
 
 ##

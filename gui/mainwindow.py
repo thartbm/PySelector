@@ -1,15 +1,11 @@
-import wx, sys, os
+import wx, os
 from wx import *
 import matplotlib
 import numpy as np
-import pandas as pd
 
 matplotlib.use('WXAgg')
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_wxagg import FigureCanvasWxAgg as FigureCanvas
-from gui import settingwindow
-import wx.lib.agw.gradientbutton as gbtn
-from database.database import get_experiment as exp
 from database.Read_Data import set_data
 from database.Plot_Data import velocity_profiler, reach_profiler
 from gui import settingwindow
