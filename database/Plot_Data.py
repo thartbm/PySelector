@@ -52,7 +52,7 @@ def velocityprofile(data):
     fig = plt.figure(facecolor='gray', edgecolor='r')
     ax = fig.add_subplot(111)
     ax.plot(INTPTime, INTPSpeed)
-    velocityline = ax.axvline(maxtime, color='r')
+    velocityline = ax.axvline(maxtime, color='r',label='velocity')
     p1line = ax.axvline(p1time, color='b')
     p2line = ax.axvline(p2time, color='g')
 

@@ -129,10 +129,9 @@ class MainPanel(wx.Panel):
                 self.VelocityCanvas.figure = fig
             elif self.selected_velocity is 'user':
                 # maybe do this differently (outsource to a function?) . Consider this later.
-                self.VelocityCanvas.figure.get_axes()[0].get_children()[1].set_xdata(self.trial_data['max_velocity'])
+                self.VelocityCanvas.figure.get_axes()[0].get_children()[1].set_xdata(self.trial_data['max_velocity'].iloc[0])
                 self.selected_velocity = 'pyselect'
-
-        self.VelocityCanvas.draw()
+                self.VelocityCanvas.draw()
 
     # def OnItemSelected(self, event):
     #    selected_row = event.GetIndex()
