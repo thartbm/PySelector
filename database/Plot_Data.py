@@ -16,29 +16,22 @@ def velocity_profiler(data, velocity_choice):
 
 
 def reach_profiler(data, setting, max_position, max_velocity):
-    return reachprofile(data,setting, max_velocity)
+    return reachprofile(data, setting, max_velocity)
 
 
 def velocityupdate():
     pass
 
 def velocityprofile(data):
-    #Variables
-    realdata = data['Real']
-    xreal = [row[0] for row in realdata]
-    yreal = [row[1] for row in realdata]
-    dispdata = data['Display']
-    xdisp = [row[0] for row in dispdata]
-    ydisp = [row[1] for row in dispdata]
 
 
     #VelocityPorfile/ Interpolate and draw
-    Xpoly = interp1d(data['Time'], xreal)
-    Ypoly = interp1d(data['Time'], yreal)
-    INTPTime = np.linspace(data['Time'][0], data['Time'][-1], num=20, endpoint=True)
+    Xpoly = interp1d(data['time'], data.hand_x)
+    Ypoly = interp1d(data['time'], data.hand_Y)
+    INTPTime = np.linspace(data['time'].iloc[0], data['time'].iloc[-1], num=20, endpoint=True)
     INTPXmouse = Xpoly(INTPTime)
     INTPYmouse = Ypoly(INTPTime)
-    RealSpeed = calculate_speeds(xreal, yreal, data['Time'])
+    RealSpeed = calculate_speeds(data.hand_x, data.hand_Y, data['time'])
     INTPSpeed = np.append(0, calculate_speeds(INTPXmouse, INTPYmouse, INTPTime))
     maxspeed = INTPSpeed.max()
     p_speed = maxspeed * 0.1
@@ -51,10 +44,10 @@ def velocityprofile(data):
         else:
             p2idx =x[0]
 
-    p1time = data['Time'][p1idx]
-    p2time = data['Time'][p2idx]
-    maxtime = data['Time'][maxspeedidx]
-    max_position = [xreal[maxspeedidx], yreal[maxspeedidx]]
+    p1time = data['time'].iloc[p1idx]
+    p2time = data['time'].iloc[p2idx]
+    maxtime = data['time'].iloc[maxspeedidx]
+    max_position = [data.hand_x.iloc[maxspeedidx], data.hand_Y.iloc[maxspeedidx]]
 
     fig = plt.figure(facecolor='gray', edgecolor='r')
     ax = fig.add_subplot(111)
@@ -67,24 +60,17 @@ def velocityprofile(data):
     return fig, p1time, p2time , max_position, maxtime
 
 def reachprofile(data, setting, max_velocity):
-    #Variables
-    realdata = data['Real']
-    xreal = [row[0] for row in realdata]
-    yreal = [row[1] for row in realdata]
-    dispdata = data['Display']
-    xdisp = [row[0] for row in dispdata]
-    ydisp = [row[1] for row in dispdata]
+
 
 
     #updating/ finding max_velocity positon on reach plot
-    maxspeedidx = next(x[0] for x in enumerate(data['Time']) if x[1] >= max_velocity)
-    max_position = [xreal[maxspeedidx], yreal[maxspeedidx]]
+    maxspeedidx = next(x[0] for x in enumerate(data['time']) if x[1] >= max_velocity.iloc[0])
+    max_position = [data.hand_x.iloc[maxspeedidx], data.hand_Y.iloc[maxspeedidx]]
 
     #ReachProfile/ draw
-
-    target = patches.Circle(data['Targets'][0], radius=0.02, color='g', fill=True)
+    target_locations = np.unique(list(zip(list(data.targetposx), list(data.targetposy))), axis=0)
+    target = patches.Circle(target_locations[0], radius=0.02, color='g', fill=True)
     max_velocity = patches.Circle(max_position, radius=0.02, color='b', fill=True)
-    circ = patches.Circle(data['Targets'][0], radius=0.02, color='g', fill=True)
     fig2 = plt.figure(facecolor='gray', edgecolor='b')
     ax = fig2.add_subplot(111)
     ax.set_aspect('equal')
@@ -109,7 +95,7 @@ def reachprofile(data, setting, max_velocity):
     ax.set_ylim([ydown, yup])
     ax.set_xlim([xleft, xright])
 
-    ax.plot(xreal, yreal, 'g', xdisp, ydisp, 'r')
+    ax.plot(data.hand_x, data.hand_Y, 'g', data.cursorx, data.cursory, 'r')
     ax.add_patch(target)
     ax.add_patch(max_velocity)
     plt.close()

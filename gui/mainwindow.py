@@ -108,14 +108,14 @@ class MainPanel(wx.Panel):
         plt.axis([0, 1, 0, 1])
         self.VelocityCanvas = FigureCanvas(self, -1, fig)
         self.VelocityCanvas.SetMinSize((100, 100))
-        #self.VelocityCanvas.draw()
 
     def __updatereachplot(self):
         # this is somewhat prone to errors, it should be fine as long as the program consistnaly runs velocity plots
         # before reach plots though as it does now.
         fig = reach_profiler(self.trial_data, self.setting, self.max_position, self.trial_data['max_velocity'])
         self.ReachCanvas.figure = fig
-        #self.ReachCanvas.draw()
+ #       self.ReachCanvas.draw()
+
 
     def __updatevelocityplot(self):
         if self.Fixp1p2:
@@ -169,6 +169,7 @@ class MainPanel(wx.Panel):
 
     def set_trial_data(self, trial):
         self.trial_data = self.experiment['Trial'][trial]
+        self.trial_data.where(self.trial_data.selected == 1, inplace=True)
         self.refresh()
 
     def refresh(self):
@@ -179,27 +180,21 @@ class MainPanel(wx.Panel):
 
     def updateoutput(self):
         #this will be a lot nicer once we actually have segments defined
-        self.setting['Segments'][0] = 0
-        self.setting['Segments'][1]  = 1
-        output = self.experiment['output'][(self.experiment['output'].trial == self.InfoPanel.current_trial)
-                              & (self.experiment['output'].step >= int(self.setting['Segments'][0]))
-                              & (self.experiment['output'].step <= int(self.setting['Segments'][1]))]
-        cond = (self.experiment['output'].trial == self.InfoPanel.current_trial)\
-                              & (self.experiment['output'].step >= int(self.setting['Segments'][0]))\
-                              & (self.experiment['output'].step <= int(self.setting['Segments'][1]))
-        output.accept = self.trial_data['Accept']
-        output.unsure = self.trial_data['Unsure']
+        if self.setting['Segments'][0] is '':
+            self.setting['Segments'][0] = self.trial_data.step.min()
+            self.setting['Segments'][1] = self.trial_data.step.max()
 
-        maxvel_idx = next(x[0] for x in enumerate(self.trial_data['Time']) if x[1] >= self.trial_data['max_velocity'])
-        p1_idx = next(x[0] for x in enumerate(self.trial_data['Time']) if x[1] >= self.trial_data['P1'])
-        p2_idx = next(x[0] for x in enumerate(self.trial_data['Time']) if x[1] >= self.trial_data['P2'])
+        #updated_segments = self.trial_data.index[self.trial_data.selected == 1]
+        #maxvel_idx = next(x[0] for x in enumerate(self.trial_data['time']) if x[1] >= self.trial_data['max_velocity'].iloc[0])
+        #p1_idx = next(x[0] for x in enumerate(self.trial_data['time']) if x[1] >= self.trial_data['P1'][0])
+        #p2_idx = next(x[0] for x in enumerate(self.trial_data['time']) if x[1] >= self.trial_data['P2'][1])
 
-        output['max_velocity'].iloc[maxvel_idx] = 1
-        output['p1'].iloc[p1_idx] = 1
-        output['p2'].iloc[p2_idx] = 1
-        start = np.where(cond)[0][0]
-        end = np.where(cond)[0][-1]
-        self.experiment['output'].iloc[start:end, :] = output
+        #self.experiment['output'].loc[updated_segments,'selected'] = 1
+        #self.experiment['output'].loc[updated_segments,'selected'] = 1
+        #self.experiment['output'].loc[updated_segments,'selected'] = 1
+        # NOT SURE IF WE OUTPUT P1 P2 here, will update accorindlgy
+
+
 
     def outputdata(self):
         self.experiment['output'].to_csv('test.csv',index=False)
@@ -255,7 +250,7 @@ class InfoPanel(wx.Panel):
         self.current_trial = list(experiment['Trial'].keys())[self.trial_index]
         self.all_trials = list(experiment['Trial'].keys())
         self.trial.SetLabel(str(self.current_trial) + '/' + str(self.all_trials[-1]))
-        self.parent.set_trial_data( self.current_trial)
+        self.parent.set_trial_data(self.current_trial)
 
 
 class ButtonPanel(wx.Panel):

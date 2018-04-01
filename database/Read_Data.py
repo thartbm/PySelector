@@ -34,8 +34,8 @@ def set_experiment(data, setting):
     output_data = data
     output_data['accept'] = 0
     output_data['max_velocity'] = 0
-    output_data['p1'] = 0
-    output_data['p2'] = 0
+    output_data['selected'] = 0
+    output_data['interpolated'] = 0
     output_data['unsure'] = 0
     cfg['output'] = output_data
 
@@ -53,20 +53,14 @@ def set_experiment(data, setting):
         if step_end is '':
             step_end = group.step.max()
 
-      #  if step_start is
         cfg['Trial'][name] = set_trial(group, step_start, step_end)
 
     return cfg
 
 def set_trial(trial, step_start, step_end):
-        segment = trial.where(trial.step.between(int(step_start),int(step_end)))
-        segment.dropna(axis=0, how='any', thresh=None, subset=None, inplace=True)
-        hand_data = list(zip(list(segment.hand_x), list(segment.hand_Y)))
-        display_data = list(zip(list(segment.cursorx), list(segment.cursory)))
-        time_data = list(map(float, segment.time))
-        targets = np.unique(list(zip(list(segment.targetposx),list(segment.targetposx))), axis=0)
-        return dict(Targets=targets, Real=hand_data, Display=display_data, Time=time_data,
-                    Accept=0, Reject=0, Unsure=0, max_velocity=0, P1=0, P2=0)
+        segment = trial.step.between(int(step_start), int(step_end)).index
+        trial.loc[segment, 'selected'] = 1
+        return trial
 
 
 
