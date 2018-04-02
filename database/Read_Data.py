@@ -31,12 +31,15 @@ def set_data(data_adress, setting):
 def set_experiment(data, setting):
     cfg = {}
     cfg['Trial'] = {}
+    data.dropna(inplace=True)  #remove any rows or columns with Nan's (maybe add a special pop up for this? some notice)
     output_data = data
     output_data['accept'] = 0
     output_data['max_velocity'] = 0
     output_data['selected'] = 0
     output_data['interpolated'] = 0
     output_data['unsure'] = 0
+    target_locations = np.unique(list(zip(list(data.targetposx), list(data.targetposy))), axis=0)
+    cfg['all_targets'] = target_locations
     cfg['output'] = output_data
 
 
@@ -54,6 +57,8 @@ def set_experiment(data, setting):
             step_end = group.step.max()
 
         cfg['Trial'][name] = set_trial(group, step_start, step_end)
+
+
 
     return cfg
 

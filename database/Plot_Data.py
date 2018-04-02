@@ -18,8 +18,8 @@ def velocity_profiler(data, velocity_choice, velocity_profile = []):
 
 
 
-def reach_profiler(data, setting, max_position, max_velocity):
-    return reachprofile(data, setting, max_velocity)
+def reach_profiler(data, setting, max_position, max_velocity, targets):
+    return reachprofile(data, setting, max_velocity, targets)
 
 
 def velocityupdate(data, velocity):
@@ -69,7 +69,7 @@ def velocityprofile(data):
     plt.close()
     return fig, p1time, p2time , max_position, maxtime, [INTPTime,INTPSpeed]
 
-def reachprofile(data, setting, max_velocity):
+def reachprofile(data, setting, max_velocity,targets):
     #start_idx = data.loc[lambda df: df.time > data['P1'].max(), :].index.min()
     #end_idx = data.loc[lambda df: df.time > data['P2'].max(), :].index.min()
     #data = data.loc[start_idx:end_idx]
@@ -80,8 +80,9 @@ def reachprofile(data, setting, max_velocity):
 
     #ReachProfile/ draw
     target_locations = np.unique(list(zip(list(data.targetposx), list(data.targetposy))), axis=0)
-    target = patches.Circle(target_locations[0], radius=0.02, color='g', fill=True)
-    max_velocity = patches.Circle(max_position, radius=0.02, color='b', fill=True)
+    all_targets = patches.Circle(targets, radius=0.01, color='g', fill=False)
+    target = patches.Circle(target_locations, radius=0.01, color='g', fill=True)
+    max_velocity = patches.Circle(max_position, radius=0.01, color='b', fill=True)
     fig2 = plt.figure(facecolor='gray', edgecolor='b')
     ax = fig2.add_subplot(111)
     ax.set_aspect('equal')
@@ -107,6 +108,7 @@ def reachprofile(data, setting, max_velocity):
     ax.set_xlim([xleft, xright])
 
     ax.plot(data.hand_x, data.hand_Y, 'g', data.cursorx, data.cursory, 'r')
+    ax.add_patch(all_targets)
     ax.add_patch(target)
     ax.add_patch(max_velocity)
     plt.close()

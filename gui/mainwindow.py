@@ -112,7 +112,7 @@ class MainPanel(wx.Panel):
     def __updatereachplot(self):
         # this is somewhat prone to errors, it should be fine as long as the program consistnaly runs velocity plots
         # before reach plots though as it does now.
-        fig = reach_profiler(self.trial_data, self.setting, self.max_position, self.trial_data['max_velocity'])
+        fig = reach_profiler(self.trial_data, self.setting, self.max_position, self.trial_data['max_velocity'], self.experiment['all_targets'])
         self.ReachCanvas.figure = fig
         self.ReachCanvas.draw()
 
