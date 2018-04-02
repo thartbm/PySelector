@@ -114,17 +114,30 @@ class MainPanel(wx.Panel):
         # before reach plots though as it does now.
         fig = reach_profiler(self.trial_data, self.setting, self.max_position, self.trial_data['max_velocity'])
         self.ReachCanvas.figure = fig
- #       self.ReachCanvas.draw()
+        self.ReachCanvas.draw()
 
 
     def __updatevelocityplot(self):
         if self.Fixp1p2:
-            self.VelocityCanvas.figure.get_axes()[0].get_children()[2].set_xdata(self.trial_data['P1'])
-            self.VelocityCanvas.figure.get_axes()[0].get_children()[3].set_xdata(self.trial_data['P2'])
+            self.VelocityCanvas.figure.get_axes()[0].get_children()[2].set_xdata(self.trial_data['P1'].max())
+            self.VelocityCanvas.figure.get_axes()[0].get_children()[3].set_xdata(self.trial_data['P2'].max())
+
+
+            if ~(self.trial_data.max_velocity.min() <= self.trial_data['P2'].min() and \
+                self.trial_data.max_velocity.min() >= self.trial_data['P1'].min()):
+                self.trial_data['max_velocity'] = velocity_profiler(self.trial_data, 'update', self.velocity_profile)[0]
+                self.VelocityCanvas.figure.get_axes()[0].get_children()[1].set_xdata(self.trial_data['max_velocity'].iloc[0])
+                self.selected_velocity = 'user'
+                self.refresh()
+
+
+
+            start_idx = self.trial_data.loc[lambda df: df.time > self.trial_data['P1'].max(), :].index.min()
+            end_idx = self.trial_data.loc[lambda df: df.time > self.trial_data['P2'].max(), :].index.min()
             self.Fixp1p2 = False
         else:
             if self.selected_velocity is 'pyselect':  # will always happen first.
-                [fig, self.trial_data['P1'], self.trial_data['P2'], self.max_position, self.trial_data['max_velocity']] \
+                [fig, self.trial_data['P1'], self.trial_data['P2'], self.max_position, self.trial_data['max_velocity'], self.velocity_profile] \
                     = velocity_profiler(self.trial_data, self.selected_velocity)
                 self.VelocityCanvas.figure = fig
             elif self.selected_velocity is 'user':

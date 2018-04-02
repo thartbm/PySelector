@@ -8,22 +8,35 @@ import numpy as np
 # Turn interactive plotting off
 plt.ioff()
 
-def velocity_profiler(data, velocity_choice):
+def velocity_profiler(data, velocity_choice, velocity_profile = []):
     if velocity_choice is 'pyselect':
         return velocityprofile(data)
     elif velocity_choice is 'user':
         pass
+    elif velocity_choice is 'update':
+        return velocityupdate(data, velocity_profile)
+
 
 
 def reach_profiler(data, setting, max_position, max_velocity):
     return reachprofile(data, setting, max_velocity)
 
 
-def velocityupdate():
-    pass
+def velocityupdate(data, velocity):
+    start_time =  data['P1'].max()
+    end_time =  data['P2'].max()
+    time = velocity[0]
+    speed = velocity[1]
+    selected_times = np.where((time >= start_time) & (time <= end_time))
+    selected_speed = np.where(speed == speed[selected_times].max())
+    return time[selected_speed]
+
+
+
+
+
 
 def velocityprofile(data):
-
 
     #VelocityPorfile/ Interpolate and draw
     Xpoly = interp1d(data['time'], data.hand_x)
@@ -35,14 +48,11 @@ def velocityprofile(data):
     INTPSpeed = np.append(0, calculate_speeds(INTPXmouse, INTPYmouse, INTPTime))
     maxspeed = INTPSpeed.max()
     p_speed = maxspeed * 0.1
-    p1idx = next(x[0] for x in enumerate(RealSpeed) if x[1] >= p_speed)
-    maxspeedidx = next(x[0] for x in enumerate(RealSpeed) if x[1] >= maxspeed)
-
-    for x in enumerate(RealSpeed):
-        if x[0] > maxspeedidx and x[1] <= p_speed:
-            break
-        else:
-            p2idx =x[0]
+    p1idx = np.argmax(RealSpeed > p_speed)
+    maxspeedidx = np.argmax(RealSpeed > maxspeed)
+    p2idx = np.argmax(RealSpeed[maxspeedidx::] <= p_speed)
+    if p2idx == 0:
+        p2idx = -1
 
     p1time = data['time'].iloc[p1idx]
     p2time = data['time'].iloc[p2idx]
@@ -52,16 +62,17 @@ def velocityprofile(data):
     fig = plt.figure(facecolor='gray', edgecolor='r')
     ax = fig.add_subplot(111)
     ax.plot(INTPTime, INTPSpeed)
-    velocityline = ax.axvline(maxtime, color='r',label='velocity')
-    p1line = ax.axvline(p1time, color='b')
-    p2line = ax.axvline(p2time, color='g')
+    ax.axvline(maxtime, color='r', label='velocity')
+    ax.axvline(p1time, color='b', label= 'p1')
+    ax.axvline(p2time, color='g', label= 'p2')
 
     plt.close()
-    return fig, p1time, p2time , max_position, maxtime
+    return fig, p1time, p2time , max_position, maxtime, [INTPTime,INTPSpeed]
 
 def reachprofile(data, setting, max_velocity):
-
-
+    #start_idx = data.loc[lambda df: df.time > data['P1'].max(), :].index.min()
+    #end_idx = data.loc[lambda df: df.time > data['P2'].max(), :].index.min()
+    #data = data.loc[start_idx:end_idx]
 
     #updating/ finding max_velocity positon on reach plot
     maxspeedidx = next(x[0] for x in enumerate(data['time']) if x[1] >= max_velocity.iloc[0])
