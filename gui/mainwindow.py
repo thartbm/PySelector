@@ -1,7 +1,6 @@
 import wx, os
 from wx import *
 import matplotlib
-import numpy as np
 
 matplotlib.use('WXAgg')
 import matplotlib.pyplot as plt

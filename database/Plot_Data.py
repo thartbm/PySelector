@@ -80,7 +80,6 @@ def reachprofile(data, setting, max_velocity,targets):
 
     #ReachProfile/ draw
     target_locations = np.unique(list(zip(list(data.targetposx), list(data.targetposy))), axis=0)
-    all_targets = patches.Circle(targets, radius=0.01, color='g', fill=False)
     target = patches.Circle(target_locations, radius=0.01, color='g', fill=True)
     max_velocity = patches.Circle(max_position, radius=0.01, color='b', fill=True)
     fig2 = plt.figure(facecolor='gray', edgecolor='b')
@@ -108,8 +107,10 @@ def reachprofile(data, setting, max_velocity,targets):
     ax.set_xlim([xleft, xright])
 
     ax.plot(data.hand_x, data.hand_Y, 'g', data.cursorx, data.cursory, 'r')
-    ax.add_patch(all_targets)
-    ax.add_patch(target)
+    for target in targets:
+        all_targets = patches.Circle(target, radius=0.01, color='g', fill=False)
+        ax.add_patch(all_targets)
+
     ax.add_patch(max_velocity)
     plt.close()
 
