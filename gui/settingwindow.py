@@ -73,9 +73,8 @@ class SettingPanel(wx.Panel):
         self.textinputs = ['Display Scale', 'Display Origin', 'Real Scale', 'Real Origin', 'Segments']
         self.checkinputs = ['Butter Filter', 'Use Pixels', 'Define Header']
 
-
         sizer = wx.BoxSizer(wx.VERTICAL)
-        sizer.Add(self.textwidgets(), 5, wx.EXPAND)
+        sizer.Add(self.textwidgets(), 5, wx.ALIGN_LEFT)
         sizer.AddStretchSpacer(1)
         sizer.Add(self.checkwidgets(), 5, wx.EXPAND)
         sizer.AddStretchSpacer(1)
@@ -88,7 +87,12 @@ class SettingPanel(wx.Panel):
 
         for idx, item in enumerate(self.textinputs):
             header = wx.StaticText(self, label=item)
-            sizer.AddMany([header, self.xyfields(idx+1)])
+            if header.GetLabel() == 'Segments':
+                #sizer.Add(['Number of Segments', wx.TextCtrl)] add this later to get multiple segments
+                #for i = 1: wx.TextCtr-output:
+                sizer.AddMany([header, self.segmentfields(idx + 1)])
+            else:
+                sizer.AddMany([header, self.xyfields(idx+1)])
 
         return sizer
 
@@ -118,11 +122,23 @@ class SettingPanel(wx.Panel):
     def xyfields(self,id):
         x = wx.StaticText(self, label='X')
         y = wx.StaticText(self, label='Y')
+        unit =  wx.StaticText(self, label='Unit')
+        xinput = wx.TextCtrl(self, id=id)
+        yinput = wx.TextCtrl(self, id=id*100)
+        unitinput = wx.TextCtrl(self, id=0) #have to change this id later.
+        sizer = wx.BoxSizer(wx.HORIZONTAL)
+        sizer.AddMany([x, xinput, y, yinput, unit, unitinput])
+        return sizer
+
+    def segmentfields(self,id):
+        x = wx.StaticText(self, label='Start')
+        y = wx.StaticText(self, label='End')
         xinput = wx.TextCtrl(self, id=id)
         yinput = wx.TextCtrl(self, id=id*100)
         sizer = wx.BoxSizer(wx.HORIZONTAL)
         sizer.AddMany([x, xinput, y, yinput])
         return sizer
+
 
 
 class SettingsList(wx.ListCtrl):

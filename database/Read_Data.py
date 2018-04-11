@@ -1,6 +1,7 @@
 import json
 import pandas as pd
 import numpy as np
+import urllib2
 from scipy.interpolate import interp1d,interp2d
 
 ## Read Settings
@@ -14,7 +15,13 @@ from scipy.interpolate import interp1d,interp2d
 
 
 def set_data(data_adress, setting):
-    set_name = 'setting/savedsettings/' + setting + '.json'
+    setting_locator = 'setting/settings.json'
+    with open(setting_locator, 'r') as fp:
+        setting_locator = json.loads(fp.read())
+
+
+
+    set_name = setting_locator['Location'] + setting + '.json'
     with open(set_name, 'r') as fp:
         setting = json.loads(fp.read())
 
