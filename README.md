@@ -5,7 +5,6 @@ PySelector should run both on Python 2.7 and 3.X, but please let us know if you 
 
 Dependencies:
 - numpy
-- urllib2
 - pandas
 - matplotlib
 - wxpython
