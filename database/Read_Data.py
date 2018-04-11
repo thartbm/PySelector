@@ -1,7 +1,6 @@
 import json
 import pandas as pd
 import numpy as np
-import urllib2
 from scipy.interpolate import interp1d,interp2d
 
 ## Read Settings
