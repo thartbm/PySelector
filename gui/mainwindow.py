@@ -131,8 +131,8 @@ class MainPanel(wx.Panel):
 
 
 
-            start_idx = self.trial_data.loc[lambda df: df.time > self.trial_data['P1'].max(), :].index.min()
-            end_idx = self.trial_data.loc[lambda df: df.time > self.trial_data['P2'].max(), :].index.min()
+            start_idx = self.trial_data.loc[lambda df: df.time_ms > self.trial_data['P1'].max(), :].index.min()
+            end_idx = self.trial_data.loc[lambda df: df.time_ms > self.trial_data['P2'].max(), :].index.min()
             self.Fixp1p2 = False
         else:
             if self.selected_velocity is 'pyselect':  # will always happen first.
@@ -179,8 +179,10 @@ class MainPanel(wx.Panel):
             self.InfoPanel.set_exp(exp_name, self.experiment)
 
     def set_trial_data(self, trial):
-        self.trial_data = self.experiment['Trial'][trial]
-        self.trial_data.where(self.trial_data.selected == 1, inplace=True)
+        self.trial_data = self.experiment['output'].where(self.experiment['output'].trial_no == trial)
+        self.trial_data.dropna(inplace = True)
+        #self.trial_data = self.experiment['Trial'][trial]
+        #self.trial_data.where(self.trial_data.selected == 1, inplace=True)
         self.refresh()
 
     def refresh(self):
@@ -258,9 +260,9 @@ class InfoPanel(wx.Panel):
     def set_exp(self, experiment_path, experiment):
         self.experiment.SetLabel(experiment_path)
         # ====  RECODE maybe? / there has to be a nicer way of handling this
-        self.current_trial = list(experiment['Trial'].keys())[self.trial_index]
-        self.all_trials = list(experiment['Trial'].keys())
-        self.trial.SetLabel(str(self.current_trial) + '/' + str(self.all_trials[-1]))
+        self.current_trial = experiment['output'].trial_no[self.trial_index]
+        self.all_trials = experiment['output'].trial_no
+        self.trial.SetLabel(str(self.current_trial) + '/' + str(self.all_trials.iloc[-1]))
         self.parent.set_trial_data(self.current_trial)
 
 

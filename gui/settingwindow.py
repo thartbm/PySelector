@@ -42,13 +42,17 @@ class MainSettingPanel(wx.Panel):
         self.Bind(wx.EVT_BUTTON, self.save)
 
     def save(self, event):
+        #investigating using label instead of Id --- makes it much more readable
         for idx, item in enumerate(self.settingpanel.textinputs):
             x = self.settingpanel.FindWindowById(idx+1).GetValue()
             y = self.settingpanel.FindWindowById((idx+1)*100).GetValue()
-            self.settingdata[item] = ([x, y])
+            if item != 'Segments':
+                unit = self.settingpanel.FindWindowById((idx+1)*1001).GetValue()
+            self.settingdata[item] = ([x, y, unit])
 
         self.settingdata['Filter'] = self.settingpanel.FindWindowById(1000).GetValue()
         self.settingdata['Use_Pixels'] = self.settingpanel.FindWindowById(1001).GetValue()
+        self.settingdata['PX_CM_Ratio'] = self.settingpanel.FindWindowById(25).GetValue()
 
         if self.settingpanel.FindWindowById(1002).GetValue():
             self.settingdata['Header'] = self.settingpanel.FindWindowById(1004).GetValue()
@@ -94,6 +98,7 @@ class SettingPanel(wx.Panel):
             else:
                 sizer.AddMany([header, self.xyfields(idx+1)])
 
+        sizer.AddMany([wx.StaticText(self, label='PixelToCM_Ratio'), wx.TextCtrl(self, id = 25)])
         return sizer
 
     def checkwidgets(self):
@@ -125,7 +130,7 @@ class SettingPanel(wx.Panel):
         unit =  wx.StaticText(self, label='Unit')
         xinput = wx.TextCtrl(self, id=id)
         yinput = wx.TextCtrl(self, id=id*100)
-        unitinput = wx.TextCtrl(self, id=0) #have to change this id later.
+        unitinput = wx.TextCtrl(self, id=id*1001)
         sizer = wx.BoxSizer(wx.HORIZONTAL)
         sizer.AddMany([x, xinput, y, yinput, unit, unitinput])
         return sizer

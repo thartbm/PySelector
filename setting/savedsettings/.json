@@ -1,27 +1,33 @@
 {
     "Display Origin": [
         "",
+        "",
         ""
     ],
     "Display Scale": [
+        "",
         "",
         ""
     ],
     "Filter": false,
     "Header": 0,
     "Name": "",
+    "PX_CM_Ratio": "",
     "Real Origin": [
+        "",
         "",
         ""
     ],
     "Real Scale": [
         "",
+        "",
         ""
     ],
     "Segments": [
         "",
+        "",
         ""
     ],
-    "Use_Pixels": false,
-    "return_units": ""
+    "Use_Pixels": "",
+    "return_units": "CM"
 }
