@@ -111,37 +111,32 @@ class MainPanel(wx.Panel):
     def __updatereachplot(self):
         # this is somewhat prone to errors, it should be fine as long as the program consistnaly runs velocity plots
         # before reach plots though as it does now.
-        fig = reach_profiler(self.trial_data, self.setting, self.max_position, self.trial_data['max_velocity'], self.experiment['all_targets'])
+        fig = reach_profiler(self.trial_data, self.setting, self.max_position, self.trial_data.selectedmaxvelocity, self.experiment['all_targets'])
         self.ReachCanvas.figure = fig
         self.ReachCanvas.draw()
 
-
     def __updatevelocityplot(self):
         if self.Fixp1p2:
-            self.VelocityCanvas.figure.get_axes()[0].get_children()[2].set_xdata(self.trial_data['P1'].max())
-            self.VelocityCanvas.figure.get_axes()[0].get_children()[3].set_xdata(self.trial_data['P2'].max())
+            self.VelocityCanvas.figure.get_axes()[0].get_children()[2].set_xdata(self.trial_data.selectedp1)
+            self.VelocityCanvas.figure.get_axes()[0].get_children()[3].set_xdata(self.trial_data.selectedp2)
 
+            if ~(self.trial_data.selectedp1 <= self.trial_data.selectedmaxvelocity <= self.trial_data.selectedp2):
+                    self.trial_data.selectedmaxvelocity = velocity_profiler(self.trial_data, 'update', self.velocity_profile)[0]
+                    self.VelocityCanvas.figure.get_axes()[0].get_children()[1].set_xdata(self.trial_data.selectedmaxvelocity)
+                    self.selected_velocity = 'user'
 
-            if ~(self.trial_data.max_velocity.min() <= self.trial_data['P2'].min() and \
-                self.trial_data.max_velocity.min() >= self.trial_data['P1'].min()):
-                self.trial_data['max_velocity'] = velocity_profiler(self.trial_data, 'update', self.velocity_profile)[0]
-                self.VelocityCanvas.figure.get_axes()[0].get_children()[1].set_xdata(self.trial_data['max_velocity'].iloc[0])
-                self.selected_velocity = 'user'
-                self.refresh()
-
-
-
-            start_idx = self.trial_data.loc[lambda df: df.time_ms > self.trial_data['P1'].max(), :].index.min()
-            end_idx = self.trial_data.loc[lambda df: df.time_ms > self.trial_data['P2'].max(), :].index.min()
+            #start_idx = self.trial_data.loc[lambda df: df.time_ms > self.trial_data['P1'].max(), :].index.min()
+            #end_idx = self.trial_data.loc[lambda df: df.time_ms > self.trial_data['P2'].max(), :].index.min()
             self.Fixp1p2 = False
+
         else:
             if self.selected_velocity is 'pyselect':  # will always happen first.
-                [fig, self.trial_data['P1'], self.trial_data['P2'], self.max_position, self.trial_data['max_velocity'], self.velocity_profile] \
+                [fig, self.trial_data.selectedp1, self.trial_data.selectedp2, self.max_position, self.trial_data.selectedmaxvelocity, self.velocity_profile] \
                     = velocity_profiler(self.trial_data, self.selected_velocity)
                 self.VelocityCanvas.figure = fig
             elif self.selected_velocity is 'user':
                 # maybe do this differently (outsource to a function?) . Consider this later.
-                self.VelocityCanvas.figure.get_axes()[0].get_children()[1].set_xdata(self.trial_data['max_velocity'].iloc[0])
+                self.VelocityCanvas.figure.get_axes()[0].get_children()[1].set_xdata(self.trial_data.selectedmaxvelocity)
                 self.selected_velocity = 'pyselect'
                 self.VelocityCanvas.draw()
 
@@ -155,15 +150,15 @@ class MainPanel(wx.Panel):
             self.fixp1p2(event)
         else:
             self.selected_velocity = 'user'
-            self.trial_data['max_velocity'] = event.xdata
+            self.trial_data.selectedmaxvelocity = event.xdata
             self.refresh()
 
     def fixp1p2(self, event):
         if self.clicknum == 1:
-            self.trial_data['P1'] = event.xdata
+            self.trial_data.selectedp1 = event.xdata
             self.clicknum = 2
         elif self.clicknum == 2:
-            self.trial_data['P2'] = event.xdata
+            self.trial_data.selectedp2 = event.xdata
             self.clicknum = 1
             self.refresh()
 
@@ -192,25 +187,15 @@ class MainPanel(wx.Panel):
         self.Layout()
 
     def updateoutput(self):
-        #this will be a lot nicer once we actually have segments defined
-        if self.setting['Segments'][0] is '':
-            self.setting['Segments'][0] = self.trial_data.step.min()
-            self.setting['Segments'][1] = self.trial_data.step.max()
-
-        #updated_segments = self.trial_data.index[self.trial_data.selected == 1]
-        #maxvel_idx = next(x[0] for x in enumerate(self.trial_data['time']) if x[1] >= self.trial_data['max_velocity'].iloc[0])
-        #p1_idx = next(x[0] for x in enumerate(self.trial_data['time']) if x[1] >= self.trial_data['P1'][0])
-        #p2_idx = next(x[0] for x in enumerate(self.trial_data['time']) if x[1] >= self.trial_data['P2'][1])
-
-        #self.experiment['output'].loc[updated_segments,'selected'] = 1
-        #self.experiment['output'].loc[updated_segments,'selected'] = 1
-        #self.experiment['output'].loc[updated_segments,'selected'] = 1
-        # NOT SURE IF WE OUTPUT P1 P2 here, will update accorindlgy
-
-
+        maxvel_idx = next(x[0] for x in enumerate(self.trial_data.time_ms) if x[1] >= self.trial_data.selectedmaxvelocity)
+        p1_idx = next(x[0] for x in enumerate(self.trial_data.time_ms) if x[1] >= self.trial_data.selectedp1)
+        p2_idx = next(x[0]+1 for x in enumerate(self.trial_data.time_ms) if x[1] >= self.trial_data.selectedp2)
+        self.trial_data.selected[p1_idx:p2_idx] = 1
+        self.trial_data.max_velocity[maxvel_idx] = 1
+        self.experiment['output'].update(self.trial_data)
 
     def outputdata(self):
-        self.experiment['output'].to_csv('test.csv',index=False)
+        self.experiment['output'].to_csv('test.csv', index=False)
 
     def onKeyPress(self, e):
         if e == wx.WXK_RIGHT:
@@ -239,7 +224,7 @@ class InfoPanel(wx.Panel):
         self.SetSizerAndFit(sizer)
 
     def update(self):
-        self.trial.SetLabel(str(self.current_trial) + '/' + str(self.all_trials[-1]))
+        self.trial.SetLabel(str(self.current_trial) + '/' + str(self.all_trials.iloc[-1]))
 
     def set_settings(self, setting_name):
         self.setting.SetLabel(os.path.splitext(setting_name)[0])  # don't include "json"
@@ -249,11 +234,11 @@ class InfoPanel(wx.Panel):
         if isinstance(direction, int):
             self.trial_index = direction
         elif direction is 'up':
-            self.trial_index +=1
+            self.trial_index += 1
         elif direction is 'down':
-            self.trial_index -=1
+            self.trial_index -= 1
 
-        self.current_trial = self.all_trials[self.trial_index]
+        self.current_trial = self.all_trials.unique()[self.trial_index]
         self.parent.set_trial_data(self.current_trial)
 
 
@@ -298,10 +283,10 @@ class ButtonPanel(wx.Panel):
 
 
     def nexttrial(self,e):
-        self.parent.updateoutput()
-        self.parent.InfoPanel.update_trial_index('up')
-        self.toggleoff()
-
+        if self.parent.trial_data.accept.min():
+            self.parent.updateoutput()
+            self.parent.InfoPanel.update_trial_index('up')
+            self.toggleoff()
 
     def fixp1p2(self, e):
         self.parent.Fixp1p2 = True
@@ -314,7 +299,7 @@ class ButtonPanel(wx.Panel):
         self.parent.trial_data['Reject'] = 1
 
     def savetrial(self, e):
-        self.parent.trial_data['Accept'] = 1
+        self.parent.trial_data['accept'] = 1
 
     def unsuretrial(self, e):
         self.parent.trial_data['Unsure'] = 1

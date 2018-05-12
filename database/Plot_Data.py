@@ -23,8 +23,8 @@ def reach_profiler(data, setting, max_position, max_velocity, targets):
 
 
 def velocityupdate(data, velocity):
-    start_time =  data['P1'].max()
-    end_time =  data['P2'].max()
+    start_time = data.selectedp1
+    end_time = data.selectedp2
     time = velocity[0]
     speed = velocity[1]
     selected_times = np.where((time >= start_time) & (time <= end_time))
@@ -44,7 +44,7 @@ def velocityprofile(data):
     INTPTime = np.linspace(data['time_ms'].iloc[0], data['time_ms'].iloc[-1], num=20, endpoint=True)
     INTPXmouse = Xpoly(INTPTime)
     INTPYmouse = Ypoly(INTPTime)
-    RealSpeed = calculate_speeds(data.penx_m, data.peny_m, data['time_ms'])
+    RealSpeed = calculate_speeds(data.penx_m.astype('float'), data.peny_m.astype('float'), data['time_ms'])
     INTPSpeed = np.append(0, calculate_speeds(INTPXmouse, INTPYmouse, INTPTime))
     maxspeed = INTPSpeed.max()
     p_speed = maxspeed * 0.1
@@ -75,11 +75,11 @@ def reachprofile(data, setting, max_velocity,targets):
     #data = data.loc[start_idx:end_idx]
 
     #updating/ finding max_velocity positon on reach plot
-    maxspeedidx = next(x[0] for x in enumerate(data['time_ms']) if x[1] >= max_velocity.iloc[0])
-    max_position = [data.penx_m.iloc[maxspeedidx], data.peny_m.iloc[maxspeedidx]]
+    maxspeedidx = next(x[0] for x in enumerate(data['time_ms']) if x[1] >= max_velocity.astype('float'))
+    max_position = [float(data.penx_m.iloc[maxspeedidx]), float(data.peny_m.iloc[maxspeedidx])]
 
     #ReachProfile/ draw
-    target_locations = np.unique(list(zip(list(data.targetx_cm), list(data.targety_cm))), axis=0)
+    target_locations = np.unique(list(zip(list(data.targetx_cm.astype('float')), list(data.targety_cm.astype('float')))), axis=0)
     target = patches.Circle(target_locations, radius=0.01, color='g', fill=True)
     max_velocity = patches.Circle(max_position, radius=0.01, color='b', fill=True)
     fig2 = plt.figure(facecolor='gray', edgecolor='b')
@@ -106,7 +106,8 @@ def reachprofile(data, setting, max_velocity,targets):
     ax.set_ylim([ydown, yup])
     ax.set_xlim([xleft, xright])
 
-    ax.plot(data.penx_m, data.peny_m, 'g', data.cursorx_cm, data.cursory_cm, 'r')
+    ax.plot(data.penx_m.astype('float'), data.peny_m.astype('float'), 'g',
+            data.cursorx_cm.astype('float'), data.cursory_cm.astype('float'), 'r')
     for target in targets:
         all_targets = patches.Circle(target, radius=0.01, color='g', fill=False)
         ax.add_patch(all_targets)

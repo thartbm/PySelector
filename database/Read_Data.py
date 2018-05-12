@@ -32,6 +32,9 @@ def set_data(data_adress, setting):
 
         # remove existing header first, need to ask for this in settings in the read with rows = 1::
         data = pd.read_csv(data_adress, sep='\t', names=setting['Header'])
+        setting['outputheaders'] = data.iloc[0]
+        data.drop(data.index[0], inplace=True)
+
         #data.drop(0, inplace = True) as commented here
 
 
@@ -45,6 +48,10 @@ def set_experiment(data, setting):
     cfg = {}
     cfg['Trial'] = {}
     output_data = data
+    output_data_header = list(output_data.keys())
+    for idx, item in enumerate(output_data_header):
+        if item.startswith('Unused'):
+            output_data.rename(index=str, columns={item: setting['outputheaders'][idx]}, inplace = True)
     output_data['accept'] = 0
     output_data['max_velocity'] = 0
     output_data['selected'] = 0
@@ -93,6 +100,8 @@ def unify_data(data, setting):
 
                     else:
                         assert('I don''t know how to handle this unit for time:  ' + unit)
+                if unit == 'ms':
+                    data['time_ms'] = data.time_ms.astype('float')
 
             if key.startswith('cursor'):
                 unit = key.split('_')[1]
@@ -105,6 +114,7 @@ def unify_data(data, setting):
                 if unit == 'm':
                     data['penx_cm'] = data.penx_m.astype('float') * 100
                     data['peny_cm'] = data.peny_m.astype('float') * 100
+
 
             if key.startswith('target'):
                 unit = key.split('_')[1]
