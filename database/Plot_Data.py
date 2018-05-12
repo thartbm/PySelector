@@ -76,50 +76,58 @@ def reachprofile(data, setting, max_velocity,targets):
 
     #updating/ finding max_velocity positon on reach plot
     maxspeedidx = next(x[0] for x in enumerate(data['time_ms']) if x[1] >= max_velocity.astype('float'))
-    max_position = [float(data.penx_m.iloc[maxspeedidx]), float(data.peny_m.iloc[maxspeedidx])]
+    max_position = [float(data.penx_cm.iloc[maxspeedidx]), float(data.peny_cm.iloc[maxspeedidx])]
 
     #ReachProfile/ draw
     target_locations = np.unique(list(zip(list(data.targetx_cm.astype('float')), list(data.targety_cm.astype('float')))), axis=0)
-    target = patches.Circle(target_locations, radius=0.01, color='g', fill=True)
-    max_velocity = patches.Circle(max_position, radius=0.01, color='b', fill=True)
+    trial_target = patches.Circle(target_locations[0], radius=.5, color='g', fill=True)
+    max_velocity = patches.Circle(max_position, radius=.5, color='b', fill=True)
     fig2 = plt.figure(facecolor='gray', edgecolor='b')
     ax = fig2.add_subplot(111)
     ax.set_aspect('equal')
-    if setting['Display Origin'] == ['', '', '']:
-        DEFAULT_DISPRANGE = [20, 20]
-        disprange = [int(tup) for tup in DEFAULT_DISPRANGE]
-        disprange = [0, 0]
-    else:
-        disprange = [int(tup) for tup in setting['Display Scale']]
 
-    if disprange[0] == 0:
-        xleft = -0.2
-        xright = 0.2
-        ydown = -0.2
-        yup = 0.2
-    else:
-        xleft = -(disprange[0]/2)
-        xright = (disprange[0]/2)
-        yup = disprange[1]/2
-        ydown = -disprange[1]/2
+    #if setting['Display Origin'] == ['', '', '']:
+    range = data.cursorx_cm.max() - data.cursorx_cm.min()
+    disprange_x = [data.cursorx_cm.min() - (range/2), data.cursorx_cm.max()+ (range/2)]
+    range = data.cursory_cm.max() - data.cursory_cm.min()
+    disprange_y = [data.cursory_cm.min() - (range/2), data.cursory_cm.max()+ (range/2)]
+    #else:
+    #    pass
+    #    print('Not using user inputted display scale yet for plotting')
 
-    ax.set_ylim([ydown, yup])
-    ax.set_xlim([xleft, xright])
 
-    ax.plot(data.penx_m.astype('float'), data.peny_m.astype('float'), 'g',
+
+    xleft = disprange_x[0]
+    xright = disprange_x[1]
+    ydown = disprange_y[0]
+    yup = disprange_y[1]
+    left = min(xleft,ydown)
+    right = max(xright, yup)
+
+
+    ax.set_ylim([left, right])
+    ax.set_xlim([left, right])
+
+    ax.plot(data.penx_cm.astype('float'), data.peny_cm.astype('float'), 'g',
             data.cursorx_cm.astype('float'), data.cursory_cm.astype('float'), 'r')
+
     for target in targets:
-        all_targets = patches.Circle(target, radius=0.01, color='g', fill=False)
+        all_targets = patches.Circle(target, radius=.5, color='g', fill=False)
         ax.add_patch(all_targets)
 
+    if 'homex_px' in data.keys():
+        homepos_x = (float(data.homex_px[0]) - setting['Display Origin'][0]) * float(setting['PX_CM_Ratio'])
+        homepos_y = (float(data.homey_px[0]) - setting['Display Origin'][1]) * float(setting['PX_CM_Ratio'])
+        home = patches.Circle([homepos_x, homepos_y], radius=.5, color='yellow', fill=True)
+
+    ax.add_patch(home)
+    ax.add_patch(trial_target)
     ax.add_patch(max_velocity)
     plt.close()
 
     return fig2
 
 
-def prepareoutputdata():
-    pass
 def calculate_speeds(x, y, Time):
     [xdiff, ydiff, timediff] = map(np.diff, [x, y, Time])
     return np.divide(np.sqrt(np.add(np.square(xdiff), np.square(ydiff))), timediff)

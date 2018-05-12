@@ -82,6 +82,8 @@ def set_trial(trial, step_start, step_end):
 
 def unify_data(data, setting):
     data.dropna(inplace=True)  #remove any rows or columns with Nan's (maybe add a special pop up for this? some notice)
+    if setting['Display Origin'] == ['', '', '']:
+        setting['Display Origin']  = [528, 395, 'px']
 
     if ~ len(setting['Header']) == len(data.columns):
         assert('Header columns and data columns do not match')
@@ -106,8 +108,8 @@ def unify_data(data, setting):
             if key.startswith('cursor'):
                 unit = key.split('_')[1]
                 if unit == 'px':
-                    data['cursorx_cm'] = data.cursorx_px.astype('float') * float(setting['PX_CM_Ratio'])
-                    data['cursory_cm'] = data.cursory_px.astype('float') * float(setting['PX_CM_Ratio'])
+                    data['cursorx_cm'] = (data.cursorx_px.astype('float') - setting['Display Origin'][0]) * float(setting['PX_CM_Ratio'])
+                    data['cursory_cm'] = (data.cursory_px.astype('float') - setting['Display Origin'][1]) * float(setting['PX_CM_Ratio'])
 
             if key.startswith('pen'):
                 unit = key.split('_')[1]
@@ -119,7 +121,7 @@ def unify_data(data, setting):
             if key.startswith('target'):
                 unit = key.split('_')[1]
                 if unit == 'px':
-                    data['targetx_cm'] = data.targetx_px.astype('float') * float(setting['PX_CM_Ratio'])
-                    data['targety_cm'] = data.targety_px.astype('float') * float(setting['PX_CM_Ratio'])
+                    data['targetx_cm'] = (data.targetx_px.astype('float') - setting['Display Origin'][0]) * float(setting['PX_CM_Ratio'])
+                    data['targety_cm'] = (data.targety_px.astype('float') - setting['Display Origin'][1]) * float(setting['PX_CM_Ratio'])
 
     return data

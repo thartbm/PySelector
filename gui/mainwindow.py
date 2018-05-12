@@ -99,7 +99,6 @@ class MainPanel(wx.Panel):
         fig = plt.figure()
         plt.axis([0, 1, 0, 1])
         self.ReachCanvas = FigureCanvas(self, -1, fig)
-        self.ReachCanvas.SetMinSize((100, 100))
         self.ReachCanvas.draw()
 
     def __setvelocityplot(self):
@@ -112,6 +111,8 @@ class MainPanel(wx.Panel):
         # this is somewhat prone to errors, it should be fine as long as the program consistnaly runs velocity plots
         # before reach plots though as it does now.
         fig = reach_profiler(self.trial_data, self.setting, self.max_position, self.trial_data.selectedmaxvelocity, self.experiment['all_targets'])
+        fig.gca().set_aspect('auto')
+
         self.ReachCanvas.figure = fig
         self.ReachCanvas.draw()
 
