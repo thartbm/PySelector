@@ -61,7 +61,7 @@ class MainPanel(wx.Panel):
     def __init__(self, parent):
         super().__init__(parent=parent)
         self.parent = parent
-        self.BackgroundColour = wx.BLACK
+        self.BackgroundColour = wx.Colour('SALMON')
         self.ButtonPanel = ButtonPanel(self)
         self.Fixp1p2 = False
         self.clicknum = 1
@@ -211,7 +211,7 @@ class InfoPanel(wx.Panel):
         super().__init__(parent=parent)
         self.parent = parent
         self.trial_index = 0
-        self.BackgroundColour = wx.RED
+        self.BackgroundColour = wx.Colour('SALMON')
         self.setting = wx.StaticText(self, -1, 'None')
         self.experiment = wx.StaticText(self, -1, 'None')
         self.trial = wx.StaticText(self, -1, '0/0')
@@ -263,7 +263,7 @@ class ButtonPanel(wx.Panel):
         self.FixP1P2 = wx.Button(self, label="Fix P1 P2")
         self.Next = wx.Button(self, label="Next")
         self.Previous = wx.Button(self, label="Previous")
-        self.BackgroundColour = wx.BLUE
+        self.BackgroundColour = wx.Colour('SALMON')
         self.gridSizer = wx.GridSizer(rows=4, cols=2, hgap=2, vgap=2)
         emptycell = (0, 0)
         self.gridSizer.AddMany([
