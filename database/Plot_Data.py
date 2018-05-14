@@ -2,7 +2,6 @@ from scipy.interpolate import interp1d
 import matplotlib
 matplotlib.use('WXAgg')
 from matplotlib import pyplot as plt
-from matplotlib.backends.backend_wxagg import Figure
 import matplotlib.patches as patches
 import numpy as np
 # Turn interactive plotting off
