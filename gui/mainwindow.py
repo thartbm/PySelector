@@ -63,7 +63,7 @@ class MainPanel(wx.Panel):
         self.parent = parent
         self.BackgroundColour = wx.Colour('SALMON')
         self.ButtonPanel = ButtonPanel(self)
-        self.Fixp1p2 = False
+        self.Fixp1p2mode = False
         self.clicknum = 1
         self.selected_velocity = 'pyselect'
         self.warningmsg = wx.MessageDialog(self, 'Please Choose Settings first', caption=MessageBoxCaptionStr,
@@ -117,29 +117,35 @@ class MainPanel(wx.Panel):
         self.ReachCanvas.draw()
 
     def __updatevelocityplot(self):
-        if self.Fixp1p2:
+        if self.Fixp1p2mode:
+            self.Fixp1p2mode = False
+            self.selected_velocity = 'pyselect'
             self.VelocityCanvas.figure.get_axes()[0].get_children()[2].set_xdata(self.trial_data.selectedp1)
             self.VelocityCanvas.figure.get_axes()[0].get_children()[3].set_xdata(self.trial_data.selectedp2)
-
+            [c, a, b, d, self.trial_data.selectedmaxvelocity,e] = velocity_profiler(self.trial_data, self.selected_velocity)
             if ~(self.trial_data.selectedp1 <= self.trial_data.selectedmaxvelocity <= self.trial_data.selectedp2):
                     self.trial_data.selectedmaxvelocity = velocity_profiler(self.trial_data, 'update', self.velocity_profile)[0]
                     self.VelocityCanvas.figure.get_axes()[0].get_children()[1].set_xdata(self.trial_data.selectedmaxvelocity)
-                    self.selected_velocity = 'user'
+
+
+
 
             #start_idx = self.trial_data.loc[lambda df: df.time_ms > self.trial_data['P1'].max(), :].index.min()
-            #end_idx = self.trial_data.loc[lambda df: df.time_ms > self.trial_data['P2'].max(), :].index.min()
-            self.Fixp1p2 = False
+            #end_idx = self.trial_data.loc[lambda df: df.time_ms > self.trial_data['P2'].max(), :].index.min
+            self.VelocityCanvas.draw()
 
         else:
             if self.selected_velocity is 'pyselect':  # will always happen first.
                 [fig, self.trial_data.selectedp1, self.trial_data.selectedp2, self.max_position, self.trial_data.selectedmaxvelocity, self.velocity_profile] \
                     = velocity_profiler(self.trial_data, self.selected_velocity)
                 self.VelocityCanvas.figure = fig
+
             elif self.selected_velocity is 'user':
                 # maybe do this differently (outsource to a function?) . Consider this later.
                 self.VelocityCanvas.figure.get_axes()[0].get_children()[1].set_xdata(self.trial_data.selectedmaxvelocity)
                 self.selected_velocity = 'pyselect'
-                self.VelocityCanvas.draw()
+
+            self.VelocityCanvas.draw()
 
     # def OnItemSelected(self, event):
     #    selected_row = event.GetIndex()
@@ -147,7 +153,7 @@ class MainPanel(wx.Panel):
     #    self.refresh()
 
     def onVelcoityclick(self, event):
-        if self.Fixp1p2:
+        if self.Fixp1p2mode:
             self.fixp1p2(event)
             self.selected_velocity = 'pyselect'
 
@@ -188,6 +194,8 @@ class MainPanel(wx.Panel):
         self.__updatereachplot()
         self.InfoPanel.update()
         self.Layout()
+        self.Fit()
+        self.parent.Fit()
 
     def updateoutput(self):
         maxvel_idx = next(x[0] for x in enumerate(self.trial_data.time_ms) if x[1] >= self.trial_data.selectedmaxvelocity)
@@ -292,7 +300,7 @@ class ButtonPanel(wx.Panel):
             self.toggleoff()
 
     def fixp1p2(self, e):
-        self.parent.Fixp1p2 = True
+        self.parent.Fixp1p2mode = True
 
     def prvstrial(self, e):
         self.parent.InfoPanel.update_trial_index('down')
