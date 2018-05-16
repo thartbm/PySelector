@@ -123,6 +123,7 @@ def unify_data(data, setting):
                     data.drop('penx_m', axis=1, inplace=True)
 
             if key.startswith('peny'):
+                if unit == 'm':
                     data['peny_cm'] = data.peny_m.astype('float') * 100
                     data.drop('peny_m', axis=1, inplace=True)
 
