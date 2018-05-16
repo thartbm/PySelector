@@ -149,6 +149,8 @@ class MainPanel(wx.Panel):
     def onVelcoityclick(self, event):
         if self.Fixp1p2:
             self.fixp1p2(event)
+            self.selected_velocity = 'pyselect'
+
         else:
             self.selected_velocity = 'user'
             self.trial_data.selectedmaxvelocity = event.xdata
