@@ -176,7 +176,7 @@ class MainPanel(wx.Panel):
 
     def set_trial_data(self, trial):
         self.trial_data = self.experiment['output'].where(self.experiment['output'].trial_no == trial)
-        self.trial_data.dropna(inplace = True)
+        self.trial_data.dropna(inplace= True)
         #self.trial_data = self.experiment['Trial'][trial]
         #self.trial_data.where(self.trial_data.selected == 1, inplace=True)
         self.refresh()

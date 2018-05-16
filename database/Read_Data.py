@@ -28,12 +28,11 @@ def set_data(data_adress, setting):
         setting['Header'] = eval(setting['Header'])
         for idx, item in enumerate(setting['Header']):
             if item is '':
-                setting['Header'][idx] = 'Unused'
-
+                setting['Header'][idx] = 'Unused' + str(idx)
         # remove existing header first, need to ask for this in settings in the read with rows = 1::
         data = pd.read_csv(data_adress, sep='\t', names=setting['Header'])
-        setting['outputheaders'] = data.iloc[0]
-        data.drop(data.index[0], inplace=True)
+        #setting['outputheaders'] = data.iloc[0]
+        #data.drop(data.index[0], inplace=True)
 
         #data.drop(0, inplace = True) as commented here
 
@@ -41,7 +40,7 @@ def set_data(data_adress, setting):
     else:
         data = pd.read_csv(data_adress, sep='\t')
 
-    data = unify_data(data, setting) #this is to set the columns and units
+    unify_data(data, setting) #this is to set the columns and units
     return set_experiment(data, setting), setting
 
 def set_experiment(data, setting):
@@ -49,9 +48,9 @@ def set_experiment(data, setting):
     cfg['Trial'] = {}
     output_data = data
     output_data_header = list(output_data.keys())
-    for idx, item in enumerate(output_data_header):
-        if item.startswith('Unused'):
-            output_data.rename(index=str, columns={item: setting['outputheaders'][idx]}, inplace = True)
+    #for idx, item in enumerate(output_data_header):
+    #    if item.startswith('Unused'):
+    #        data.columns.values[idx] = setting['outputheaders'][idx]
     output_data['accept'] = 0
     output_data['max_velocity'] = 0
     output_data['selected'] = 0
@@ -96,32 +95,46 @@ def unify_data(data, setting):
                 if unit != 'ms':
                     if unit == 's':
                         data['time_ms'] = data.time_s.astype('float') * 1000
-
+                        data.drop('time_s', axis=1, inplace=True)
                     elif unit == 'm':
                         data['time_ms'] = data.time_m.astype('float') / 60000
-
+                        data.drop('time_m', axis=1, inplace=True)
                     else:
                         assert('I don''t know how to handle this unit for time:  ' + unit)
                 if unit == 'ms':
                     data['time_ms'] = data.time_ms.astype('float')
 
-            if key.startswith('cursor'):
+            if key.startswith('cursorx'):
                 unit = key.split('_')[1]
                 if unit == 'px':
                     data['cursorx_cm'] = (data.cursorx_px.astype('float') - setting['Display Origin'][0]) * float(setting['PX_CM_Ratio'])
-                    data['cursory_cm'] = (data.cursory_px.astype('float') - setting['Display Origin'][1]) * float(setting['PX_CM_Ratio'])
+                    data.drop('cursorx_px', axis=1, inplace=True)
 
-            if key.startswith('pen'):
+            if key.startswith('cursory'):
+                unit = key.split('_')[1]
+                if unit == 'px':
+                    data['cursory_cm'] = (data.cursory_px.astype('float') - setting['Display Origin'][1]) * float(setting['PX_CM_Ratio'])
+                    data.drop('cursory_px', axis=1, inplace=True)
+
+            if key.startswith('penx'):
                 unit = key.split('_')[1]
                 if unit == 'm':
                     data['penx_cm'] = data.penx_m.astype('float') * 100
+                    data.drop('penx_m', axis=1, inplace=True)
+
+            if key.startswith('peny'):
                     data['peny_cm'] = data.peny_m.astype('float') * 100
+                    data.drop('peny_m', axis=1, inplace=True)
 
-
-            if key.startswith('target'):
+            if key.startswith('targetx'):
                 unit = key.split('_')[1]
                 if unit == 'px':
                     data['targetx_cm'] = (data.targetx_px.astype('float') - setting['Display Origin'][0]) * float(setting['PX_CM_Ratio'])
-                    data['targety_cm'] = (data.targety_px.astype('float') - setting['Display Origin'][1]) * float(setting['PX_CM_Ratio'])
+                    data.drop('targetx_px', axis=1, inplace=True)
 
-    return data
+            if key.startswith('targety'):
+                unit = key.split('_')[1]
+                if unit == 'px':
+                    data['targety_cm'] = (data.targety_px.astype('float') - setting['Display Origin'][1]) * float(setting['PX_CM_Ratio'])
+                    data.drop('targety_px', axis=1, inplace=True)
+
