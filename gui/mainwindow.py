@@ -110,6 +110,8 @@ class MainPanel(wx.Panel):
     def __updatereachplot(self):
         # this is somewhat prone to errors, it should be fine as long as the program consistnaly runs velocity plots
         # before reach plots though as it does now.
+        selection = self.trial_data.index[self.trial_data.time_ms.between(self.trial_data.selectedp1, self.trial_data.selectedp2)]
+        self.trial_data.selected.iloc[selection] = 1
         fig = reach_profiler(self.trial_data, self.setting, self.max_position, self.trial_data.selectedmaxvelocity, self.experiment['all_targets'])
         fig.gca().set_aspect('auto')
 
@@ -122,9 +124,8 @@ class MainPanel(wx.Panel):
             self.selected_velocity = 'pyselect'
             self.VelocityCanvas.figure.get_axes()[0].get_children()[2].set_xdata(self.trial_data.selectedp1)
             self.VelocityCanvas.figure.get_axes()[0].get_children()[3].set_xdata(self.trial_data.selectedp2)
-            [c, a, b, d, self.trial_data.selectedmaxvelocity,e] = velocity_profiler(self.trial_data, self.selected_velocity)
             if ~(self.trial_data.selectedp1 <= self.trial_data.selectedmaxvelocity <= self.trial_data.selectedp2):
-                    self.trial_data.selectedmaxvelocity = velocity_profiler(self.trial_data, 'update', self.velocity_profile)[0]
+                    self.trial_data.selectedmaxvelocity = velocity_profiler(self.trial_data, 'update', self.velocity_profile)[4]
                     self.VelocityCanvas.figure.get_axes()[0].get_children()[1].set_xdata(self.trial_data.selectedmaxvelocity)
 
 
@@ -194,9 +195,6 @@ class MainPanel(wx.Panel):
         self.__updatereachplot()
         self.InfoPanel.update()
         self.Layout()
-        self.Fit()
-        self.parent.Fit()
-
     def updateoutput(self):
         maxvel_idx = next(x[0] for x in enumerate(self.trial_data.time_ms) if x[1] >= self.trial_data.selectedmaxvelocity)
         p1_idx = next(x[0] for x in enumerate(self.trial_data.time_ms) if x[1] >= self.trial_data.selectedp1)
