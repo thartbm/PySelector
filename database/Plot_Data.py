@@ -49,8 +49,8 @@ def velocityprofile(data):
     p_speed = maxspeed * 0.1
     p1idx = np.argmax(RealSpeed > p_speed)
     maxspeedidx = np.argmax(RealSpeed > maxspeed)
-    p2idx = np.argmax(RealSpeed[maxspeedidx::] <= p_speed)
-    if p2idx == 0:
+    p2idx = maxspeedidx + np.argmax(RealSpeed[maxspeedidx::] <= p_speed)
+    if p2idx == maxspeedidx:
         p2idx = -1
 
     p1time = data['time_ms'].iloc[p1idx]
@@ -74,11 +74,13 @@ def reachprofile(data, setting, max_velocity,targets):
     #data = data.loc[start_idx:end_idx]
 
     #updating/ finding max_velocity positon on reach plot
-    maxspeedidx = next(x[0] for x in enumerate(data['time_ms']) if x[1] >= max_velocity.astype('float'))
-    max_position = [float(data.penx_cm.iloc[maxspeedidx]), float(data.peny_cm.iloc[maxspeedidx])]
+    selected_data = data.index[data.selected == 1].tolist()
+    reachplotdata = data.iloc[selected_data].copy()
+    maxspeedidx = next(x[0] for x in enumerate(reachplotdata['time_ms']) if x[1] >= max_velocity.astype('float'))
+    max_position = [float(reachplotdata.penx_cm.iloc[maxspeedidx]), float(reachplotdata.peny_cm.iloc[maxspeedidx])]
 
     #ReachProfile/ draw
-    target_locations = np.unique(list(zip(list(data.targetx_cm.astype('float')), list(data.targety_cm.astype('float')))), axis=0)
+    target_locations = np.unique(list(zip(list(reachplotdata.targetx_cm.astype('float')), list(reachplotdata.targety_cm.astype('float')))), axis=0)
     trial_target = patches.Circle(target_locations[0], radius=.5, color='g', fill=True)
     max_velocity = patches.Circle(max_position, radius=.5, color='b', fill=True)
     fig2 = plt.figure(facecolor='gray', edgecolor='b')
@@ -86,10 +88,10 @@ def reachprofile(data, setting, max_velocity,targets):
     ax.set_aspect('equal')
 
     #if setting['Display Origin'] == ['', '', '']:
-    range = data.cursorx_cm.max() - data.cursorx_cm.min()
-    disprange_x = [data.cursorx_cm.min() - (range/2), data.cursorx_cm.max()+ (range/2)]
-    range = data.cursory_cm.max() - data.cursory_cm.min()
-    disprange_y = [data.cursory_cm.min() - (range/2), data.cursory_cm.max()+ (range/2)]
+    range = reachplotdata.cursorx_cm.max() - reachplotdata.cursorx_cm.min()
+    disprange_x = [reachplotdata.cursorx_cm.min() - (range/2), reachplotdata.cursorx_cm.max()+ (range/2)]
+    range = reachplotdata.cursory_cm.max() - reachplotdata.cursory_cm.min()
+    disprange_y = [reachplotdata.cursory_cm.min() - (range/2), reachplotdata.cursory_cm.max()+ (range/2)]
     #else:
     #    pass
     #    print('Not using user inputted display scale yet for plotting')
@@ -107,8 +109,8 @@ def reachprofile(data, setting, max_velocity,targets):
     ax.set_ylim([left, right])
     ax.set_xlim([left, right])
 
-    ax.plot(data.penx_cm.astype('float'), data.peny_cm.astype('float'), 'g',
-            data.cursorx_cm.astype('float'), data.cursory_cm.astype('float'), 'r')
+    ax.plot(reachplotdata.penx_cm.astype('float'), reachplotdata.peny_cm.astype('float'), 'g',
+            reachplotdata.cursorx_cm.astype('float'), reachplotdata.cursory_cm.astype('float'), 'r')
 
     for target in targets:
         all_targets = patches.Circle(target, radius=.5, color='g', fill=False)

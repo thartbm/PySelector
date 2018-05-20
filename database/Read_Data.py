@@ -1,6 +1,7 @@
 import json
 import pandas as pd
 import numpy as np
+import os
 from scipy.interpolate import interp1d,interp2d
 
 ## Read Settings
@@ -19,7 +20,7 @@ def set_data(data_adress, setting):
         setting_locator = json.loads(fp.read())
 
     # if we commit to Python3 this should be done using the new path module
-    set_name = setting_locator['Location'] + '/' + setting + '.json'
+    set_name = setting_locator['Location'] + os.path.sep + setting + '.json'
     with open(set_name, 'r') as fp:
         setting = json.loads(fp.read())
 
@@ -46,7 +47,7 @@ def set_data(data_adress, setting):
 def set_experiment(data, setting):
     cfg = {}
     cfg['Trial'] = {}
-    output_data = data
+    output_data = data.copy()
     output_data_header = list(output_data.keys())
     #for idx, item in enumerate(output_data_header):
     #    if item.startswith('Unused'):
@@ -69,13 +70,15 @@ def set_experiment(data, setting):
         if step_start is '':
             group.selected = 1
         else:
+            step_start = int(step_start)
+            step_end = int(step_end)
             cfg['Trial'][name] = set_trial(group, step_start, step_end)
 
 
     return cfg
 
 def set_trial(trial, step_start, step_end):
-        segment = trial.step.between(int(step_start), int(step_end)).index
+        segment = trial.index[trial.step.between(int(step_start), int(step_end))]
         trial.loc[segment, 'selected'] = 1
         return trial
 
