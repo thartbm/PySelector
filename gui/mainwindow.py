@@ -40,12 +40,15 @@ class MyFrame(wx.Frame):
         # wx.CallAfter(self.setframesize)
 
     def setframesize(self):
-        MinSizeX, MinSizeY = self.MainPanel.Sizer.GetMinSize()
+        MinSizeX, MinSizeY = self.MainPanel.Sizer.GetSize()
         self.MinClientSize = (MinSizeX, MinSizeY)
         self.ClientSize = (MinSizeX, MinSizeY)
 
     def set_settings(self, exp_name):
         self.MainPanel.set_settings(exp_name)
+
+    def set_settingfolder(self, file):
+        self.MainPanel.settingfolder = file
 
     def set_exp(self, setting_name):
         self.MainPanel.set_exp(setting_name)
@@ -70,6 +73,7 @@ class MainPanel(wx.Panel):
                                            style=OK | CENTRE, pos=DefaultPosition)
         self.__setpanel()
         self.__dolayout()
+        self.settingfolder = 'setting/savedsettings'
         self.Bind(wx.EVT_KEY_DOWN, self.onKeyPress)
 
         # Event Handlers
@@ -111,7 +115,8 @@ class MainPanel(wx.Panel):
         # this is somewhat prone to errors, it should be fine as long as the program consistnaly runs velocity plots
         # before reach plots though as it does now.
         selection = self.trial_data.index[self.trial_data.time_ms.between(self.trial_data.selectedp1, self.trial_data.selectedp2)]
-        self.trial_data.selected.iloc[selection] = 1
+        self.trial_data.selected = 0
+        self.trial_data.selected.loc[selection] = 1
         fig = reach_profiler(self.trial_data, self.setting, self.max_position, self.trial_data.selectedmaxvelocity, self.experiment['all_targets'])
         fig.gca().set_aspect('auto')
 
@@ -125,7 +130,7 @@ class MainPanel(wx.Panel):
             self.VelocityCanvas.figure.get_axes()[0].get_children()[2].set_xdata(self.trial_data.selectedp1)
             self.VelocityCanvas.figure.get_axes()[0].get_children()[3].set_xdata(self.trial_data.selectedp2)
             if ~(self.trial_data.selectedp1 <= self.trial_data.selectedmaxvelocity <= self.trial_data.selectedp2):
-                    self.trial_data.selectedmaxvelocity = velocity_profiler(self.trial_data, 'update', self.velocity_profile)[4]
+                    self.trial_data.selectedmaxvelocity = velocity_profiler(self.trial_data, 'update', self.velocity_profile)
                     self.VelocityCanvas.figure.get_axes()[0].get_children()[1].set_xdata(self.trial_data.selectedmaxvelocity)
 
 
@@ -133,6 +138,7 @@ class MainPanel(wx.Panel):
 
             #start_idx = self.trial_data.loc[lambda df: df.time_ms > self.trial_data['P1'].max(), :].index.min()
             #end_idx = self.trial_data.loc[lambda df: df.time_ms > self.trial_data['P2'].max(), :].index.min
+            self.VelocityCanvas.figure.gca().set_aspect('auto')
             self.VelocityCanvas.draw()
 
         else:
@@ -146,6 +152,7 @@ class MainPanel(wx.Panel):
                 self.VelocityCanvas.figure.get_axes()[0].get_children()[1].set_xdata(self.trial_data.selectedmaxvelocity)
                 self.selected_velocity = 'pyselect'
 
+            self.VelocityCanvas.figure.gca().set_aspect('auto')
             self.VelocityCanvas.draw()
 
     # def OnItemSelected(self, event):
@@ -175,12 +182,14 @@ class MainPanel(wx.Panel):
     def set_settings(self, setting_name):
         self.InfoPanel.set_settings(setting_name)
 
+
+
     def set_exp(self, exp_name):
         if self.InfoPanel.setting.GetLabel() == 'None':
             self.warningmsg.ShowModal()
 
         else:
-            self.experiment, self.setting = set_data(exp_name, self.InfoPanel.setting.GetLabel())
+            self.experiment, self.setting = set_data(exp_name, self.settingfolder, self.InfoPanel.setting.GetLabel())
             self.InfoPanel.set_exp(exp_name, self.experiment)
 
     def set_trial_data(self, trial):
@@ -194,7 +203,9 @@ class MainPanel(wx.Panel):
         self.__updatevelocityplot()
         self.__updatereachplot()
         self.InfoPanel.update()
+        self.__dolayout()
         self.Layout()
+        self.parent.setframesize()
     def updateoutput(self):
         maxvel_idx = next(x[0] for x in enumerate(self.trial_data.time_ms) if x[1] >= self.trial_data.selectedmaxvelocity)
         p1_idx = next(x[0] for x in enumerate(self.trial_data.time_ms) if x[1] >= self.trial_data.selectedp1)
@@ -331,15 +342,15 @@ class PopupMenu(wx.MenuBar):
         self.filemenu = wx.Menu()
         self.settingsmenu = wx.Menu()
         self.savedsettings = wx.Menu()  # savedsetting is a submenu of settingmenu
-        all_settings = [x for x in os.listdir('setting/savedsettings') if
-                        x.endswith(".json")]  # setings that already exist
 
-        for item in all_settings:
-            self.savedsettings.Append(-1, item)
+        self.getsettings()
 
         # settingmenu buttons
-        newsetting = self.settingsmenu.Append(-1, 'New Setting')
-        settingchoice = self.settingsmenu.Append(-1, 'Choose Setting...', self.savedsettings)
+
+        settingfolder = self.settingsmenu.Append(-1,  "Setting Folder")
+        settingchoice = self.settingsmenu.Append(-1, 'Quick Setting...', self.savedsettings)
+        newsetting = self.settingsmenu.Append(-1, 'Interactive Setting')
+
 
         # filemenu buttons
         loaddata = self.filemenu.Append(-1, 'load')
@@ -350,10 +361,12 @@ class PopupMenu(wx.MenuBar):
         self.Append(self.settingsmenu, 'Settings')
 
         self.filepicker = wx.FileDialog(self)
+        self.folderpicker = wx.DirDialog(self)
 
         ##Bindings
         self.Bind(EVT_MENU, self.loadsettinggui, newsetting)
         self.Bind(EVT_MENU, self.outputdata, writedata)
+        self.Bind(EVT_MENU, self.getsettingfolder, settingfolder)
         self.Bind(EVT_MENU, self.getdata, loaddata)
         self.savedsettings.Bind(wx.EVT_MENU, self.choosesetting)
 
@@ -376,6 +389,21 @@ class PopupMenu(wx.MenuBar):
     def outputdata(self, e):
         self.parent.MainPanel.outputdata()
 
+
+    def getsettingfolder(self, e):
+        self.folderpicker.ShowModal()
+        self.parent.set_settingfolder(self.folderpicker.GetPath())
+        self.getsettings()
+
+    def getsettings(self):
+        current_items = self.savedsettings.GetMenuItems()
+        for item in current_items:
+            self.savedsettings.DestroyItem(item)
+
+        all_settings = [x for x in os.listdir(self.parent.MainPanel.settingfolder) if
+                        x.endswith(".json")]
+        for item in all_settings:
+            self.savedsettings.Append(-1, item)
 
 def run():
     app = MyApp(False)
