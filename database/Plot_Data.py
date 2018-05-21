@@ -75,7 +75,7 @@ def reachprofile(data, setting, max_velocity,targets):
 
     #updating/ finding max_velocity positon on reach plot
     selected_data = data.index[data.selected == 1].tolist()
-    reachplotdata = data.iloc[selected_data].copy()
+    reachplotdata = data.loc[selected_data].copy()
     maxspeedidx = next(x[0] for x in enumerate(reachplotdata['time_ms']) if x[1] >= max_velocity.astype('float'))
     max_position = [float(reachplotdata.penx_cm.iloc[maxspeedidx]), float(reachplotdata.peny_cm.iloc[maxspeedidx])]
 

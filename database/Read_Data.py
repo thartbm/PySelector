@@ -14,13 +14,16 @@ from scipy.interpolate import interp1d,interp2d
 ## output
 
 
-def set_data(data_adress, setting):
-    setting_locator = 'setting/settings.json'
-    with open(setting_locator, 'r') as fp:
-        setting_locator = json.loads(fp.read())
+def set_data(data_adress, setting_locator, setting):
+    if not setting_locator:
+        setting_locator = 'setting/settings.json'
+        with open(setting_locator, 'r') as fp:
+            setting_locator = json.loads(fp.read())
+
+        setting_locator = setting_locator['location']
 
     # if we commit to Python3 this should be done using the new path module
-    set_name = setting_locator['Location'] + os.path.sep + setting + '.json'
+    set_name = setting_locator + os.path.sep + setting + '.json'
     with open(set_name, 'r') as fp:
         setting = json.loads(fp.read())
 
