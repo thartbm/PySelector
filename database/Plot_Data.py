@@ -66,7 +66,7 @@ def velocityprofile(data):
     ax.axvline(p2time, color='g', label= 'p2')
 
     plt.close()
-    return fig, p1time, p2time , max_position, maxtime, [INTPTime,INTPSpeed]
+    return fig, p1time, p2time, max_position, maxtime, [INTPTime,INTPSpeed]
 
 def reachprofile(data, setting, max_velocity,targets):
     #start_idx = data.loc[lambda df: df.time > data['P1'].max(), :].index.min()
@@ -77,12 +77,14 @@ def reachprofile(data, setting, max_velocity,targets):
     selected_data = data.index[data.selected == 1].tolist()
     reachplotdata = data.loc[selected_data].copy()
     maxspeedidx = next(x[0] for x in enumerate(reachplotdata['time_ms']) if x[1] >= max_velocity.astype('float'))
-    max_position = [float(reachplotdata.penx_cm.iloc[maxspeedidx]), float(reachplotdata.peny_cm.iloc[maxspeedidx])]
+    max_pen_position = [float(reachplotdata.penx_cm.iloc[maxspeedidx]), float(reachplotdata.peny_cm.iloc[maxspeedidx])]
+    max_cursor_position = [float(reachplotdata.cursorx_cm.iloc[maxspeedidx]), float(reachplotdata.cursory_cm.iloc[maxspeedidx])]
 
     #ReachProfile/ draw
     target_locations = np.unique(list(zip(list(reachplotdata.targetx_cm.astype('float')), list(reachplotdata.targety_cm.astype('float')))), axis=0)
     trial_target = patches.Circle(target_locations[0], radius=.5, color='g', fill=True)
-    max_velocity = patches.Circle(max_position, radius=.5, color='b', fill=True)
+    max_penvelocity = patches.Circle(max_pen_position, radius=.5, color='b', fill=True)
+    max_cursorvelocity = patches.Circle(max_cursor_position, radius=.5, color='b', fill=True)
     fig2 = plt.figure(facecolor='gray', edgecolor='b')
     ax = fig2.add_subplot(111)
     ax.set_aspect('equal')
@@ -123,7 +125,8 @@ def reachprofile(data, setting, max_velocity,targets):
 
 
     ax.add_patch(trial_target)
-    ax.add_patch(max_velocity)
+    ax.add_patch(max_penvelocity)
+    ax.add_patch(max_cursorvelocity)
     plt.close()
 
     return fig2
