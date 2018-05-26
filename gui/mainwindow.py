@@ -181,10 +181,12 @@ class MainPanel(wx.Panel):
     def set_exp(self, exp_name):
         if self.InfoPanel.setting.GetLabel() == 'None':
             self.warningmsg.ShowModal()
-
         else:
             self.experiment, self.setting = set_data(exp_name, self.settingfolder, self.InfoPanel.setting.GetLabel())
-            self.InfoPanel.set_exp(exp_name, self.experiment)
+            self.experiment_path = os.path.abspath(os.path.join(exp_name, os.pardir))
+            self.experiment_name = os.path.splitext(os.path.basename(exp_name))[0]
+            self.output_name = self.experiment_name + '_selected.csv'
+            self.InfoPanel.set_exp(self.experiment_name, self.experiment)
 
     def set_trial_data(self, trial):
         self.trial_data = self.experiment['output'].where(self.experiment['output'].trial_no == trial)
@@ -210,7 +212,7 @@ class MainPanel(wx.Panel):
         self.experiment['output'].update(self.trial_data)
 
     def outputdata(self):
-        self.experiment['output'].to_csv('test.csv', index=False)
+        self.experiment['output'].to_csv(os.path.join(self.experiment_path,self.output_name), index=False)
 
     def onKeyPress(self, e):
         if e == wx.WXK_RIGHT:
@@ -257,8 +259,8 @@ class InfoPanel(wx.Panel):
         self.parent.set_trial_data(self.current_trial)
 
 
-    def set_exp(self, experiment_path, experiment):
-        self.experiment.SetLabel(experiment_path)
+    def set_exp(self, exp_name, experiment):
+        self.experiment.SetLabel(exp_name)
         # ====  RECODE maybe? / there has to be a nicer way of handling this
         self.current_trial = experiment['output'].trial_no[self.trial_index]
         self.all_trials = experiment['output'].trial_no
