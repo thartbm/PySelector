@@ -39,7 +39,8 @@ class MainSettingPanel(wx.Panel):
 
         self.settingdata = collections.defaultdict(dict)
 
-        self.Bind(wx.EVT_BUTTON, self.save)
+        self.buttonpanel.savebutton.Bind(EVT_BUTTON, self.save)
+        self.buttonpanel.loadbutton.Bind(EVT_BUTTON, self.load)
 
     def save(self, event):
         #investigating using label instead of Id --- makes it much more readable
@@ -65,6 +66,32 @@ class MainSettingPanel(wx.Panel):
         output_fname = 'setting/savedsettings/' + self.settingdata['Name'] + '.json'
         with open(output_fname, 'w') as fp:
             json.dump(self.settingdata, fp, sort_keys=True, indent=4, separators=(',', ': '))
+
+        self.settinglist.refresh()
+        self.Layout()
+
+    def load(self, event):
+        setting_locator = os.path.join(os.getcwd(), 'setting', 'savedsettings')
+        selected_setting = self.settinglist.GetItem(self.settinglist.GetFocusedItem()).GetText()
+        set_name = os.path.join(setting_locator, selected_setting)
+        with open(set_name, 'r') as fp:
+            setting = json.loads(fp.read())
+
+        for idx, item in enumerate(self.settingpanel.textinputs):
+            self.settingpanel.FindWindowById(idx + 1).SetValue(setting[item][0])
+            self.settingpanel.FindWindowById((idx + 1) * 100).SetValue(setting[item][1])
+            if item != 'Segments':
+                self.settingpanel.FindWindowById((idx + 1) * 1001).SetValue(setting[item][2])
+
+        self.settingpanel.FindWindowById(1000).SetValue(setting['Filter'])
+        self.settingpanel.FindWindowById(1001).SetValue(setting['Use_Pixels'])
+        self.settingpanel.FindWindowById(25).SetValue(setting['PX_CM_Ratio'])
+
+        if setting['Header']:
+            self.settingpanel.FindWindowById(1004).SetValue(setting['Header'])
+
+        self.settingpanel.FindWindowById(5000).SetStringSelection(setting['return_units'])
+        self.buttonpanel.expname.SetValue(setting['Name'])
 
         self.settinglist.refresh()
         self.Layout()
@@ -98,7 +125,7 @@ class SettingPanel(wx.Panel):
             else:
                 sizer.AddMany([header, self.xyfields(idx+1)])
 
-        sizer.AddMany([wx.StaticText(self, label='PixelToCM_Ratio'), wx.TextCtrl(self, id = 25)])
+        sizer.AddMany([wx.StaticText(self, label='PixelToCM_Ratio'), wx.TextCtrl(self, id= 25)])
         return sizer
 
     def checkwidgets(self):
@@ -176,7 +203,7 @@ class SettingButtonPanel(wx.Panel):
         # Event Handlers
         self.savebutton.Bind(wx.EVT_BUTTON, self.save)
         self.donebutton.Bind(wx.EVT_BUTTON, self.close)
-
+        self.loadbutton.Bind(wx.EVT_BUTTON, self.load)
 
     def __dolayout(self):
         sizer = wx.BoxSizer(wx.VERTICAL)
@@ -195,6 +222,9 @@ class SettingButtonPanel(wx.Panel):
 
     def close(self, e):
         self.parent.parent.Close()
+
+    def load(self, e):
+        e.Skip()
 
 
 
