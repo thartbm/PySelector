@@ -26,6 +26,7 @@ class MyFrame(wx.Frame):
         # Attributes
         self.parent = parent
         self.MainPanel = MainPanel(self)
+        self.MainPanel.ButtonPanel.SetFocus()
         self.PopupMenu = PopupMenu(self)
 
         # Local Variables
@@ -36,9 +37,9 @@ class MyFrame(wx.Frame):
         self.SetMenuBar(self.PopupMenu)
         self.SetIcon(icon)
 
-        # self.SetSizerAndFit(self.MainPanel.Sizer, wx.GROW)
-
-        # wx.CallAfter(self.setframesize)
+        self.Bind(wx.EVT_KEY_DOWN, self.MainPanel.ButtonPanel.keypressed)
+        self.MainPanel.Bind(wx.EVT_KEY_DOWN, self.MainPanel.ButtonPanel.keypressed)
+        self.PopupMenu.Bind(wx.EVT_KEY_DOWN, self.MainPanel.ButtonPanel.keypressed)
 
     def setframesize(self):
         MinSizeX, MinSizeY = self.MainPanel.Sizer.GetSize()
@@ -61,6 +62,7 @@ class MainPanel(wx.Panel):
         self.parent = parent
         self.BackgroundColour = wx.Colour('SALMON')
         self.ButtonPanel = ButtonPanel(self)
+        self.ButtonPanel.SetFocus()
         self.Fixp1p2mode = False
         self.clicknum = 1
         self.selected_velocity = 'pyselect'
@@ -69,14 +71,9 @@ class MainPanel(wx.Panel):
         self.__setpanel()
         self.__dolayout()
         self.settingfolder = os.path.join(os.getcwd(), 'setting', 'savedsettings')
-        self.Bind(wx.EVT_KEY_DOWN, self.onKeyPress)
-
-        # Event Handlers
-        # self.Bind(wx.EVT_LIST_ITEM_SELECTED,
-        #          self.OnItemSelected)
-
         self.VelocityCanvas.mpl_connect('button_press_event',
                                         self.onVelcoityclick)
+
 
     def __setpanel(self):
         self.InfoPanel = InfoPanel(self)
@@ -215,13 +212,7 @@ class MainPanel(wx.Panel):
     def outputdata(self):
         self.experiment['output'].to_csv(os.path.join(self.experiment_path,self.output_name), index=False)
 
-    def onKeyPress(self, e):
-        if e == wx.WXK_RIGHT:
-            self.MainPanel.ButtonPanel.nexttrial(e)
-        elif e == wx.WXK_LEFT:
-            self.MainPanel.ButtonPane.prvstrial(e)
-        elif e == wx.WXK_DOWN:
-            self.MainPanel.ButtonPane.savetrial(e)
+
 
 class InfoPanel(wx.Panel):
     def __init__(self, parent):
@@ -276,6 +267,7 @@ class ButtonPanel(wx.Panel):
     def __init__(self, parent):
         super().__init__(parent=parent)
         self.parent = parent
+        self.SetFocus()
         self.Unsure = wx.CheckBox(self, size=(100, 10), label="Unsure")
         self.Save = wx.ToggleButton(self, label="Accept")
         self.SetMax = wx.Button(self, label=" Max Velocity")
@@ -305,6 +297,18 @@ class ButtonPanel(wx.Panel):
         self.Bind(wx.EVT_TOGGLEBUTTON, self.savetrial, self.Save)
         self.Bind(wx.EVT_TOGGLEBUTTON, self.deltrial, self.Delete)
         self.Bind(wx.EVT_BUTTON,  self.jumptotrial, self.GotoButton)
+
+        self.Bind(wx.EVT_KEY_DOWN, self.keypressed)
+
+
+    def keypressed(self, e):
+        if e.KeyCode == wx.WXK_RIGHT:
+            self.nexttrial(e)
+        elif e.KeyCode == wx.WXK_LEFT:
+            self.prvstrial(e)
+        elif e.KeyCode == wx.WXK_DOWN:
+            self.savetrial(e)
+
 
 
     def nexttrial(self,e):
