@@ -28,7 +28,7 @@ class MyFrame(wx.Frame):
         self.PopupMenu = PopupMenu(self)
 
         # Local Variables
-        icon_path = './gui/icons/appicon.png'
+        icon_path = os.path.join(os.getcwd(), 'gui', 'icons', 'appicon.png')
         icon = wx.Icon(icon_path, wx.BITMAP_TYPE_PNG)
 
         # Actions
@@ -54,12 +54,6 @@ class MyFrame(wx.Frame):
         self.MainPanel.set_exp(setting_name)
 
 
-
-
-
-
-
-
 class MainPanel(wx.Panel):
     def __init__(self, parent):
         super().__init__(parent=parent)
@@ -73,7 +67,7 @@ class MainPanel(wx.Panel):
                                            style=OK | CENTRE, pos=DefaultPosition)
         self.__setpanel()
         self.__dolayout()
-        self.settingfolder = 'setting/savedsettings'
+        self.settingfolder = os.path.join(os.getcwd(), 'setting', 'savedsettings')
         self.Bind(wx.EVT_KEY_DOWN, self.onKeyPress)
 
         # Event Handlers
