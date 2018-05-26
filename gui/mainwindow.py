@@ -201,11 +201,12 @@ class MainPanel(wx.Panel):
         self.Layout()
         self.parent.setframesize()
     def updateoutput(self):
+
         maxvel_idx = next(x[0] for x in enumerate(self.trial_data.time_ms) if x[1] >= self.trial_data.selectedmaxvelocity)
         p1_idx = next(x[0] for x in enumerate(self.trial_data.time_ms) if x[1] >= self.trial_data.selectedp1)
         p2_idx = next(x[0]+1 for x in enumerate(self.trial_data.time_ms) if x[1] >= self.trial_data.selectedp2)
-        self.trial_data.selected[p1_idx:p2_idx] = 1
-        self.trial_data.max_velocity[maxvel_idx] = 1
+        self.trial_data.selected.iloc[p1_idx:p2_idx] = 1
+        self.trial_data.max_velocity.iloc[maxvel_idx] = 1
         self.experiment['output'].update(self.trial_data)
 
     def outputdata(self):

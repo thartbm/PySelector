@@ -92,11 +92,6 @@ def reachprofile(data, setting, max_velocity,targets):
     disprange_x = [reachplotdata.cursorx_cm.min() - (range/2), reachplotdata.cursorx_cm.max()+ (range/2)]
     range = reachplotdata.cursory_cm.max() - reachplotdata.cursory_cm.min()
     disprange_y = [reachplotdata.cursory_cm.min() - (range/2), reachplotdata.cursory_cm.max()+ (range/2)]
-    #else:
-    #    pass
-    #    print('Not using user inputted display scale yet for plotting')
-
-
 
     xleft = disprange_x[0]
     xright = disprange_x[1]
