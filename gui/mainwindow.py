@@ -8,6 +8,7 @@ from matplotlib.backends.backend_wxagg import FigureCanvasWxAgg as FigureCanvas
 from database.Read_Data import set_data
 from database.Plot_Data import velocity_profiler, reach_profiler
 from gui import settingwindow
+import numpy as np
 
 
 class MyApp(wx.App):
@@ -249,13 +250,16 @@ class InfoPanel(wx.Panel):
 
     def update_trial_index(self, direction):
         if isinstance(direction, int):
-            self.trial_index = direction
+            self.current_trial = direction
+            self.trial_index = np.where(self.all_trials.unique() == self.current_trial)[0][0]
         elif direction is 'up':
             self.trial_index += 1
+            self.current_trial = self.all_trials.unique()[self.trial_index]
+
         elif direction is 'down':
             self.trial_index -= 1
+            self.current_trial = self.all_trials.unique()[self.trial_index]
 
-        self.current_trial = self.all_trials.unique()[self.trial_index]
         self.parent.set_trial_data(self.current_trial)
 
 
@@ -276,33 +280,43 @@ class ButtonPanel(wx.Panel):
         self.Save = wx.ToggleButton(self, label="Accept")
         self.SetMax = wx.Button(self, label=" Max Velocity")
         self.Delete = wx.ToggleButton(self, label="Reject ")
-        self.FixP1P2 = wx.Button(self, label="Fix P1 P2")
+        self.Goto = wx.TextCtrl(self)
+        self.GotoButton = wx.Button(self, label= "Go")
+        self.FixP1P2 = wx.Button(self, label= "Fix P1 P2")
         self.Next = wx.Button(self, label="Next")
         self.Previous = wx.Button(self, label="Previous")
         self.BackgroundColour = wx.Colour('SALMON')
+        goto_sizer = wx.BoxSizer(wx.HORIZONTAL)
+        goto_sizer.AddMany([(self.Goto, 1/3), (self.GotoButton,2/3)])
         self.gridSizer = wx.GridSizer(rows=4, cols=2, hgap=2, vgap=2)
-        emptycell = (0, 0)
         self.gridSizer.AddMany([
             (self.FixP1P2, wx.ALIGN_CENTER), (self.SetMax, wx.ALIGN_CENTER),
-            emptycell, (self.Unsure, wx.ALIGN_LEFT),
+            goto_sizer, (self.Unsure, wx.ALIGN_CENTER),
             (self.Save, wx.ALIGN_CENTER), (self.Delete, wx.ALIGN_CENTER),
             (self.Previous), (self.Next)])
 
         self.SetSizer(self.gridSizer)
 
-        ##Actions
+        # Actions
         self.Bind(wx.EVT_BUTTON, self.nexttrial, self.Next)
         self.Bind(wx.EVT_BUTTON, self.prvstrial, self.Previous)
         self.Bind(wx.EVT_BUTTON, self.fixp1p2, self.FixP1P2)
         self.Bind(wx.EVT_TOGGLEBUTTON, self.unsuretrial, self.Unsure)
         self.Bind(wx.EVT_TOGGLEBUTTON, self.savetrial, self.Save)
         self.Bind(wx.EVT_TOGGLEBUTTON, self.deltrial, self.Delete)
+        self.Bind(wx.EVT_BUTTON,  self.jumptotrial, self.GotoButton)
 
 
     def nexttrial(self,e):
         if self.parent.trial_data.accept.min():
             self.parent.updateoutput()
             self.parent.InfoPanel.update_trial_index('up')
+            self.toggleoff()
+
+    def jumptotrial(self, e):
+        if self.parent.trial_data.accept.min():
+            self.parent.updateoutput()
+            self.parent.InfoPanel.update_trial_index(int(self.Goto.GetValue()))
             self.toggleoff()
 
     def fixp1p2(self, e):
