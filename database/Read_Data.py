@@ -27,7 +27,7 @@ def set_data(data_adress, setting_locator, setting):
             if item is '':
                 setting['Header'][idx] = 'Unused' + str(idx)
         # remove existing header first, need to ask for this in settings in the read with rows = 1::
-        data = pd.read_csv(data_adress, sep='\t', names=setting['Header'])
+        data = pd.read_csv(data_adress, sep='\t', skiprows=[0], names=setting['Header'])
         #setting['outputheaders'] = data.iloc[0]
         #data.drop(data.index[0], inplace=True)
 
