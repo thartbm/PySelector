@@ -197,9 +197,9 @@ class MainPanel(wx.Panel):
         self.__updatevelocityplot()
         self.__updatereachplot()
         self.InfoPanel.update()
-        self.__dolayout()
+        #self.__dolayout()
         self.Layout()
-        self.parent.setframesize()
+        #self.parent.setframesize()
     def updateoutput(self):
 
         maxvel_idx = next(x[0] for x in enumerate(self.trial_data.time_ms) if x[1] >= self.trial_data.selectedmaxvelocity)
