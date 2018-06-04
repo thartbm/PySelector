@@ -5,4 +5,4 @@ PySelector is developed on Python 3.6.
 
 Install dependencies:
 
-`pip install wxPython numpy pandas matplotlib`
+`pip install wxPython numpy pandas matplotlib scipy`
