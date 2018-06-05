@@ -127,6 +127,7 @@ def reachprofile(data, setting, max_velocity,targets):
     ax.add_patch(trial_target)
     ax.add_patch(max_penvelocity)
     ax.add_patch(max_cursorvelocity)
+    ax.legend(['Real', 'Display'])
     plt.close()
 
     return fig2
