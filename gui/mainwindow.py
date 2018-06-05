@@ -312,13 +312,13 @@ class ButtonPanel(wx.Panel):
 
 
     def nexttrial(self,e):
-        if self.parent.trial_data.accept.min():
+        if self.parent.trial_data.accept.min() or self.parent.trial_data.Reject.min():
             self.parent.updateoutput()
             self.parent.InfoPanel.update_trial_index('up')
             self.toggleoff()
 
     def jumptotrial(self, e):
-        if self.parent.trial_data.accept.min():
+        if self.parent.trial_data.accept.min() or self.parent.trial_data.Reject.min():
             self.parent.updateoutput()
             self.parent.InfoPanel.update_trial_index(int(self.Goto.GetValue()))
             self.toggleoff()
