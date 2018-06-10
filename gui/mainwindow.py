@@ -230,7 +230,7 @@ class InfoPanel(wx.Panel):
         super().__init__(parent=parent)
         self.parent = parent
         self.trial_index = 0
-        self.BackgroundColour = wx.Colour('SALMON')
+        self.BackgroundColour = wx.Colour('GRAY')
         self.setting = wx.StaticText(self, -1, 'None')
         self.experiment = wx.StaticText(self, -1, 'None')
         self.trial = wx.StaticText(self, -1, '0/0')
@@ -288,7 +288,7 @@ class ButtonPanel(wx.Panel):
         self.FixP1P2 = wx.Button(self, label= "Fix P1 P2")
         self.Next = wx.Button(self, label="Next")
         self.Previous = wx.Button(self, label="Previous")
-        self.BackgroundColour = wx.Colour('SALMON')
+        self.BackgroundColour = wx.Colour('GRAY')
         goto_sizer = wx.BoxSizer(wx.HORIZONTAL)
         goto_sizer.AddMany([(self.Goto, 1/3), (self.GotoButton,2/3)])
         self.gridSizer = wx.GridSizer(rows=4, cols=2, hgap=2, vgap=2)
