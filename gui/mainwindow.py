@@ -19,16 +19,9 @@ class MyApp(wx.App):
         return True
 
 
-
-
-
-
-
-
-
 class MyFrame(wx.Frame):
     def __init__(self, parent):
-        super().__init__(parent, -1, "PySelect", size=(1000, 700))
+        super().__init__(parent, -1, "PySelect", size=(1100, 720))
 
 
         # Attributes
@@ -119,7 +112,7 @@ class MainPanel(wx.Panel):
         fig = plt.figure()
         plt.axis([0, 1, 0, 1])
         self.VelocityCanvas = FigureCanvas(self, -1, fig)
-        self.VelocityCanvas.SetMinSize((100, 100))
+        self.VelocityCanvas.SetMinSize((100, 200))
 
     def __updatereachplot(self):
         # this is somewhat prone to errors, it should be fine as long as the program  runs velocity plots
@@ -201,18 +194,16 @@ class MainPanel(wx.Panel):
 
     def set_trial_data(self, trial):
         self.trial_data = self.experiment['output'].where(self.experiment['output'].trial_no == trial)
-        self.trial_data.dropna(inplace= True)
+        self.trial_data.dropna(inplace=True)
         self.refresh()
 
     def refresh(self):
         self.__updatevelocityplot()
         self.__updatereachplot()
         self.InfoPanel.update()
-        #self.__dolayout()
         self.Layout()
-        #self.parent.setframesize()
-    def updateoutput(self):
 
+    def updateoutput(self):
         maxvel_idx = next(x[0] for x in enumerate(self.trial_data.time_ms) if x[1] >= self.trial_data.selectedmaxvelocity)
         p1_idx = next(x[0] for x in enumerate(self.trial_data.time_ms) if x[1] >= self.trial_data.selectedp1)
         p2_idx = next(x[0]+1 for x in enumerate(self.trial_data.time_ms) if x[1] >= self.trial_data.selectedp2)
@@ -221,7 +212,7 @@ class MainPanel(wx.Panel):
         self.experiment['output'].update(self.trial_data)
 
     def outputdata(self):
-        self.experiment['output'].to_csv(os.path.join(self.experiment_path,self.output_name), index=False)
+        self.experiment['output'].to_csv(os.path.join(self.experiment_path, self.output_name), index=False)
 
 
 
@@ -280,10 +271,12 @@ class InfoPanel(wx.Panel):
         self.parent.set_trial_data(self.current_trial)
 
     def set_mode(self, accepeted):
-        if accepeted:
+        if accepeted == 1:
             self.trial_mode.SetLabel('Accepted')
-        else:
+        elif accepeted == -1:
             self.trial_mode.SetLabel('Rejected')
+        else:
+            self.trial_mode.SetLabel('Not_Seleted')
 
 
 
@@ -338,12 +331,14 @@ class ButtonPanel(wx.Panel):
     def nexttrial(self,e):
         if self.parent.trial_data.accept.min() or self.parent.trial_data.Reject.min():
             self.parent.updateoutput()
+            self.parent.InfoPanel.set_mode(0)
             self.parent.InfoPanel.update_trial_index('up')
             self.toggleoff()
 
     def jumptotrial(self, e):
         if self.parent.trial_data.accept.min() or self.parent.trial_data.Reject.min():
             self.parent.updateoutput()
+            self.parent.InfoPanel.set_mode(0)
             self.parent.InfoPanel.update_trial_index(int(self.Goto.GetValue()))
             self.toggleoff()
 
@@ -352,14 +347,14 @@ class ButtonPanel(wx.Panel):
 
     def prvstrial(self, e):
         self.parent.InfoPanel.update_trial_index('down')
+        self.parent.InfoPanel.set_mode(0)
         self.toggleoff()
 
     def deltrial(self, e):
         self.parent.trial_data['Reject'] = 1
         self.parent.trial_data['accept'] = 0
         self.Save.SetValue(0)
-
-        self.parent.InfoPanel.set_mode(0)
+        self.parent.InfoPanel.set_mode(-1)
 
     def savetrial(self, e):
         self.parent.trial_data['accept'] = 1
