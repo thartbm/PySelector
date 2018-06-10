@@ -232,15 +232,21 @@ class InfoPanel(wx.Panel):
         self.trial_index = 0
         self.BackgroundColour = wx.Colour('GRAY')
         self.setting = wx.StaticText(self, -1, 'None')
-        self.experiment = wx.StaticText(self, -1, 'None')
+        self.trial_mode = wx.StaticText(self, -1, 'not_selected')
+        self.experiment = wx.StaticText(self, -1,'none')
         self.trial = wx.StaticText(self, -1, '0/0')
 
         settinglabel = wx.StaticText(self, -1, "Setting:")
         experimentlabel = wx.StaticText(self, -1, "Experiment:")
         triallabel = wx.StaticText(self, -1, "Trials:")
+        acceptedlabel = wx.StaticText(self, -1, "Trial_mode:")
 
-        sizer = wx.GridSizer(3, 2, 5, 5)
-        sizer.AddMany([settinglabel, self.setting, experimentlabel, self.experiment, triallabel, self.trial])
+
+
+        sizer = wx.GridSizer(rows=4, cols =2, hgap=5, vgap=5)
+
+        sizer.AddMany([settinglabel, self.setting, experimentlabel, self.experiment,
+                       triallabel, self.trial, acceptedlabel,  self.trial_mode])
         self.SetSizerAndFit(sizer)
 
     def update(self):
@@ -272,6 +278,13 @@ class InfoPanel(wx.Panel):
         self.all_trials = experiment['output'].trial_no
         self.trial.SetLabel(str(self.current_trial) + '/' + str(self.all_trials.iloc[-1]))
         self.parent.set_trial_data(self.current_trial)
+
+    def set_mode(self, accepeted):
+        if accepeted:
+            self.trial_mode.SetLabel('Accepted')
+        else:
+            self.trial_mode.SetLabel('Rejected')
+
 
 
 class ButtonPanel(wx.Panel):
@@ -343,9 +356,16 @@ class ButtonPanel(wx.Panel):
 
     def deltrial(self, e):
         self.parent.trial_data['Reject'] = 1
+        self.parent.trial_data['accept'] = 0
+        self.Save.SetValue(0)
+
+        self.parent.InfoPanel.set_mode(0)
 
     def savetrial(self, e):
         self.parent.trial_data['accept'] = 1
+        self.parent.trial_data['Reject'] = 0
+        self.Delete.SetValue(0)
+        self.parent.InfoPanel.set_mode(1)
 
     def unsuretrial(self, e):
         self.parent.trial_data['Unsure'] = 1
