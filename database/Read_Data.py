@@ -109,26 +109,28 @@ def unify_data(data, setting):
                     data['penx_cm'] = data.penx_m.astype('float') * 100
                     data.drop('penx_m', axis=1, inplace=True)
 
-            if key.startswith('handx'):
-                unit = key.split('_')[1]
-                if unit == 'm':
-                    data['penx_cm'] = data.handx_m.astype('float') * 100
-                    data.drop('handx_m', axis=1, inplace=True)
-                elif unit == 'cm':
-                    data['penx_cm'] = data.handx_cm.astype('float') * 100
-
-            if key.startswith('handy'):
-                unit = key.split('_')[1]
-                if unit == 'm':
-                    data['peny_cm'] = data.handy_m.astype('float') * 100
-                    data.drop('handy_m', axis=1, inplace=True)
-                elif unit == 'cm':
-                    data['peny_cm'] = data.handy_cm.astype('float') * 100
-
             if key.startswith('peny'):
                 if unit == 'm':
                     data['peny_cm'] = data.peny_m.astype('float') * 100
                     data.drop('peny_m', axis=1, inplace=True)
+
+            if key.startswith('handx'):
+                unit = key.split('_')[1]
+                if unit == 'm':
+                    data['handx_cm'] = data.handx_m.astype('float') * 100
+                    data.drop('handx_m', axis=1, inplace=True)
+                elif unit == 'cm':
+                    data['handx_cm'] = data.handx_cm.astype('float') * 100
+
+            if key.startswith('handy'):
+                unit = key.split('_')[1]
+                if unit == 'm':
+                    data['handy_cm'] = data.handy_m.astype('float') * 100
+                    data.drop('handy_m', axis=1, inplace=True)
+                elif unit == 'cm':
+                    data['handy_cm'] = data.handy_cm.astype('float') * 100
+
+
 
             if key.startswith('targetx'):
                 unit = key.split('_')[1]
