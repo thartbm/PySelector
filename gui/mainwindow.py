@@ -291,10 +291,10 @@ class ButtonPanel(wx.Panel):
         self.Unsure = wx.CheckBox(self, size=(100, 10), label="Unsure")
         self.Save = wx.ToggleButton(self, label="Accept")
         self.SetMax = wx.ToggleButton(self, label=" Max Velocity")
+        self.FixP1P2 = wx.ToggleButton(self, label= "Fix P1 P2")
         self.Delete = wx.ToggleButton(self, label="Reject ")
         self.Goto = wx.TextCtrl(self)
         self.GotoButton = wx.Button(self, label= "Go")
-        self.FixP1P2 = wx.ToggleButton(self, label= "Fix P1 P2")
         self.Next = wx.Button(self, label="Next")
         self.Previous = wx.Button(self, label="Previous")
         self.BackgroundColour = wx.Colour('GRAY')
@@ -310,6 +310,9 @@ class ButtonPanel(wx.Panel):
         self.SetSizer(self.gridSizer)
 
         self.SetMax.Value = 1
+        self.SetMax.Label
+        self.SetMax.SetOwnBackgroundColour('#FF0000')
+        self.FixP1P2.SetOwnBackgroundColour('#0000FF')
 
         # Actions
         self.Bind(wx.EVT_BUTTON, self.nexttrial, self.Next)
