@@ -129,6 +129,9 @@ class MainPanel(wx.Panel):
     def __updatevelocityplot(self):
         if self.Fixp1p2mode:
             self.Fixp1p2mode = False
+            self.ButtonPanel.FixP1P2.Value = 0
+            self.ButtonPanel.SetMax.Value = 1
+
             self.selected_velocity = 'pyselect'
             self.VelocityCanvas.figure.get_axes()[0].get_children()[2].set_xdata(self.trial_data.selectedp1)
             self.VelocityCanvas.figure.get_axes()[0].get_children()[3].set_xdata(self.trial_data.selectedp2)
@@ -287,14 +290,15 @@ class ButtonPanel(wx.Panel):
         self.SetFocus()
         self.Unsure = wx.CheckBox(self, size=(100, 10), label="Unsure")
         self.Save = wx.ToggleButton(self, label="Accept")
-        self.SetMax = wx.Button(self, label=" Max Velocity")
+        self.SetMax = wx.ToggleButton(self, label=" Max Velocity")
         self.Delete = wx.ToggleButton(self, label="Reject ")
         self.Goto = wx.TextCtrl(self)
         self.GotoButton = wx.Button(self, label= "Go")
-        self.FixP1P2 = wx.Button(self, label= "Fix P1 P2")
+        self.FixP1P2 = wx.ToggleButton(self, label= "Fix P1 P2")
         self.Next = wx.Button(self, label="Next")
         self.Previous = wx.Button(self, label="Previous")
         self.BackgroundColour = wx.Colour('GRAY')
+
         goto_sizer = wx.BoxSizer(wx.HORIZONTAL)
         goto_sizer.AddMany([(self.Goto, 1/3), (self.GotoButton,2/3)])
         self.gridSizer = wx.GridSizer(rows=4, cols=2, hgap=2, vgap=2)
@@ -303,13 +307,14 @@ class ButtonPanel(wx.Panel):
             goto_sizer, (self.Unsure, wx.ALIGN_CENTER),
             (self.Save, wx.ALIGN_CENTER), (self.Delete, wx.ALIGN_CENTER),
             (self.Previous), (self.Next)])
-
         self.SetSizer(self.gridSizer)
+
+        self.SetMax.Value = 1
 
         # Actions
         self.Bind(wx.EVT_BUTTON, self.nexttrial, self.Next)
         self.Bind(wx.EVT_BUTTON, self.prvstrial, self.Previous)
-        self.Bind(wx.EVT_BUTTON, self.fixp1p2, self.FixP1P2)
+        self.Bind(wx.EVT_TOGGLEBUTTON, self.fixp1p2, self.FixP1P2)
         self.Bind(wx.EVT_TOGGLEBUTTON, self.unsuretrial, self.Unsure)
         self.Bind(wx.EVT_TOGGLEBUTTON, self.savetrial, self.Save)
         self.Bind(wx.EVT_TOGGLEBUTTON, self.deltrial, self.Delete)
@@ -333,22 +338,24 @@ class ButtonPanel(wx.Panel):
             self.parent.updateoutput()
             self.parent.InfoPanel.set_mode(0)
             self.parent.InfoPanel.update_trial_index('up')
-            self.toggleoff()
+            self.reset_buttons()
 
     def jumptotrial(self, e):
         if self.parent.trial_data.accept.min() or self.parent.trial_data.Reject.min():
             self.parent.updateoutput()
             self.parent.InfoPanel.set_mode(0)
             self.parent.InfoPanel.update_trial_index(int(self.Goto.GetValue()))
-            self.toggleoff()
+            self.reset_buttons()
 
     def fixp1p2(self, e):
         self.parent.Fixp1p2mode = True
+        self.FixP1P2.Value = 1
+        self.SetMax.Value = 0
 
     def prvstrial(self, e):
         self.parent.InfoPanel.update_trial_index('down')
         self.parent.InfoPanel.set_mode(0)
-        self.toggleoff()
+        self.reset_buttons()
 
     def deltrial(self, e):
         self.parent.trial_data['Reject'] = 1
@@ -365,9 +372,10 @@ class ButtonPanel(wx.Panel):
     def unsuretrial(self, e):
         self.parent.trial_data['Unsure'] = 1
 
-
-
-    def toggleoff(self):
+    def reset_buttons(self):
+        self.SetMax.Value = 1
+        self.Parent.FixP1P2 = 0
+        self.FixP1P2.Value = 0
         self.Unsure.SetValue(False)
         self.Save.SetValue(False)
         self.Delete.SetValue(False)
