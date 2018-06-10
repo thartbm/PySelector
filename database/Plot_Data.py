@@ -150,11 +150,11 @@ def reachprofile(data, setting, targets):
     ax.set_xlim([left, right])
 
     if 'penx_cm' in data.keys():
-        ax.plot(reachplotdata.penx_cm.astype('float'), reachplotdata.peny_cm.astype('float'), 'g',
-                reachplotdata.cursorx_cm.astype('float'), reachplotdata.cursory_cm.astype('float'), 'r')
+        ax.plot(reachplotdata.penx_cm.astype('float'), reachplotdata.peny_cm.astype('float'), 'g', marker= "o",fillstyle = 'none')
+        ax.plot(reachplotdata.cursorx_cm.astype('float'), reachplotdata.cursory_cm.astype('float'), 'r')
     elif 'handx_cm' in data.keys():
-        ax.plot(reachplotdata.handx_cm.astype('float'), reachplotdata.handy_cm.astype('float'), 'g',
-                reachplotdata.cursorx_cm.astype('float'), reachplotdata.cursory_cm.astype('float'), 'r')
+        ax.plot(reachplotdata.handx_cm.astype('float'), reachplotdata.handy_cm.astype('float'), 'g', marker= "o", fillstyle = 'none')
+        ax.plot(reachplotdata.cursorx_cm.astype('float'), reachplotdata.cursory_cm.astype('float'), 'r')
 
 
     for target in targets:
