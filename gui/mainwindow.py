@@ -19,9 +19,17 @@ class MyApp(wx.App):
         return True
 
 
+
+
+
+
+
+
+
 class MyFrame(wx.Frame):
     def __init__(self, parent):
         super().__init__(parent, -1, "PySelect", size=(1000, 700))
+
 
         # Attributes
         self.parent = parent
@@ -33,11 +41,17 @@ class MyFrame(wx.Frame):
         icon_path = os.path.join(os.getcwd(), 'gui', 'icons', 'appicon.png')
         icon = wx.Icon(icon_path, wx.BITMAP_TYPE_PNG)
 
+        #closeBtn = wx.Button(MainPanel, label="Close")
+        #closeBtn.Bind(wx.EVT_BUTTON, self.onClose)
+
+
         # Actions
         self.SetMenuBar(self.PopupMenu)
         self.SetIcon(icon)
 
         self.Bind(wx.EVT_KEY_DOWN, self.MainPanel.ButtonPanel.keypressed)
+        self.Bind(wx.EVT_CLOSE, self.OnClose)
+
         self.MainPanel.Bind(wx.EVT_KEY_DOWN, self.MainPanel.ButtonPanel.keypressed)
         self.PopupMenu.Bind(wx.EVT_KEY_DOWN, self.MainPanel.ButtonPanel.keypressed)
 
@@ -54,6 +68,10 @@ class MyFrame(wx.Frame):
 
     def set_exp(self, setting_name):
         self.MainPanel.set_exp(setting_name)
+
+    def OnClose(self, event):
+        self.Destroy()
+        exit()
 
 
 class MainPanel(wx.Panel):
@@ -170,8 +188,6 @@ class MainPanel(wx.Panel):
 
     def set_settings(self, setting_name):
         self.InfoPanel.set_settings(setting_name)
-
-
 
     def set_exp(self, exp_name):
         if self.InfoPanel.setting.GetLabel() == 'None':
@@ -420,5 +436,7 @@ def run():
     app.MainLoop()
 
 
+
 if __name__ == "__main__":
     run()
+
