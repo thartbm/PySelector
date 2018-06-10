@@ -104,12 +104,12 @@ class MainPanel(wx.Panel):
         self.VelocityCanvas.SetMinSize((100, 100))
 
     def __updatereachplot(self):
-        # this is somewhat prone to errors, it should be fine as long as the program consistnaly runs velocity plots
+        # this is somewhat prone to errors, it should be fine as long as the program  runs velocity plots
         # before reach plots though as it does now.
         selection = self.trial_data.index[self.trial_data.time_ms.between(self.trial_data.selectedp1, self.trial_data.selectedp2)]
         self.trial_data.selected = 0
         self.trial_data.selected.loc[selection] = 1
-        fig = reach_profiler(self.trial_data, self.setting, self.max_position, self.trial_data.selectedmaxvelocity, self.experiment['all_targets'])
+        fig = reach_profiler(self.trial_data, self.setting, self.experiment['all_targets'])
         fig.gca().set_aspect('auto')
 
         self.ReachCanvas.figure = fig
@@ -122,11 +122,8 @@ class MainPanel(wx.Panel):
             self.VelocityCanvas.figure.get_axes()[0].get_children()[2].set_xdata(self.trial_data.selectedp1)
             self.VelocityCanvas.figure.get_axes()[0].get_children()[3].set_xdata(self.trial_data.selectedp2)
             if ~(self.trial_data.selectedp1 <= self.trial_data.selectedmaxvelocity <= self.trial_data.selectedp2):
-                    self.trial_data.selectedmaxvelocity = velocity_profiler(self.trial_data, 'update', self.velocity_profile)
+                    self.max_position = velocity_profiler(self.trial_data, 'update')
                     self.VelocityCanvas.figure.get_axes()[0].get_children()[1].set_xdata(self.trial_data.selectedmaxvelocity)
-
-
-
 
             #start_idx = self.trial_data.loc[lambda df: df.time_ms > self.trial_data['P1'].max(), :].index.min()
             #end_idx = self.trial_data.loc[lambda df: df.time_ms > self.trial_data['P2'].max(), :].index.min
@@ -135,7 +132,7 @@ class MainPanel(wx.Panel):
 
         else:
             if self.selected_velocity is 'pyselect':  # will always happen first.
-                [fig, self.trial_data.selectedp1, self.trial_data.selectedp2, self.max_position, self.trial_data.selectedmaxvelocity, self.velocity_profile] \
+                [fig, self.max_position] \
                     = velocity_profiler(self.trial_data, self.selected_velocity)
                 self.VelocityCanvas.figure = fig
 
@@ -189,8 +186,6 @@ class MainPanel(wx.Panel):
     def set_trial_data(self, trial):
         self.trial_data = self.experiment['output'].where(self.experiment['output'].trial_no == trial)
         self.trial_data.dropna(inplace= True)
-        #self.trial_data = self.experiment['Trial'][trial]
-        #self.trial_data.where(self.trial_data.selected == 1, inplace=True)
         self.refresh()
 
     def refresh(self):
@@ -415,8 +410,8 @@ class PopupMenu(wx.MenuBar):
         for item in current_items:
             self.savedsettings.DestroyItem(item)
 
-        all_settings = [x for x in os.listdir(self.parent.MainPanel.settingfolder) if
-                        x.endswith(".json")]
+        all_settings = [_ for _ in os.listdir(self.parent.MainPanel.settingfolder) if _.endswith(".json")]
+
         for item in all_settings:
             self.savedsettings.Append(-1, item)
 

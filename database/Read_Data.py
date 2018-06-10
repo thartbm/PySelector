@@ -1,43 +1,27 @@
 import json
-import pandas as pd
+from pathlib import Path
 import numpy as np
-import os
-from scipy.interpolate import interp1d, interp2d
+import pandas as pd
 
-
-## Read Settings
-## Use Settings
-## Create Segments
-## Get plots Data
-## send to gui
-
-## handling
-## output
-
-
-def set_data(data_adress, setting_locator, setting):
-    # if we commit to Python3 this should be done using the new path module
-    set_name = os.path.join(setting_locator, (setting + '.json'))
-    with open(set_name, 'r') as fp:
+def set_data(data_address, setting_locator, setting_name):
+    setting_path = Path(setting_locator) / (setting_name  + '.json')
+    with open(setting_path, 'r') as fp:
         setting = json.loads(fp.read())
 
     if setting['Header']:
         setting['Header'] = eval(setting['Header'])
         for idx, item in enumerate(setting['Header']):
-            if item is '':
-                setting['Header'][idx] = 'Unused' + str(idx)
-        # remove existing header first, need to ask for this in settings in the read with rows = 1::
-        data = pd.read_csv(data_adress, sep='\t', names=setting['Header'])
+            if item in ['', [], ' ', 'unused']:
+                setting['Header'][idx] = 'unused' + str(idx)
+
+        data = pd.read_csv(data_address, sep='\t', names=setting['Header'])
         try:
             int(data.iloc[0][0])
         except ValueError:
-            data = pd.read_csv(data_adress, sep='\t', skiprows=[0], names=setting['Header'])
-
-
-
+            data = pd.read_csv(data_address, sep='\t', skiprows=[0], names=setting['Header'])
 
     else:
-        data = pd.read_csv(data_adress, sep='\t')
+        data = pd.read_csv(data_address, sep='\t')
 
     unify_data(data, setting)  # this is to set the columns and units
     return set_experiment(data, setting), setting
@@ -53,7 +37,7 @@ def set_experiment(data, setting):
     #        data.columns.values[idx] = setting['outputheaders'][idx]
     output_data['accept'] = 0
     output_data['max_velocity'] = 0
-    output_data['selected'] = 0
+    output_data['selected'] = 1
     output_data['interpolated'] = 0
     output_data['unsure'] = 0
     target_locations = np.unique(list(zip(list(data.targetx_cm), list(data.targety_cm))), axis=0)
@@ -81,8 +65,7 @@ def set_trial(trial, step_start, step_end):
 
 
 def unify_data(data, setting):
-    data.dropna(
-        inplace=True)  # remove any rows or columns with Nan's (maybe add a special pop up for this? some notice)
+    data.dropna(inplace=True)  # remove any rows or columns with Nan's (maybe add a special pop up for this? some notice)
     if setting['Display Origin'] == ['', '', '']:
         setting['Display Origin'] = [528, 395, 'px']
 
@@ -125,6 +108,22 @@ def unify_data(data, setting):
                 if unit == 'm':
                     data['penx_cm'] = data.penx_m.astype('float') * 100
                     data.drop('penx_m', axis=1, inplace=True)
+
+            if key.startswith('handx'):
+                unit = key.split('_')[1]
+                if unit == 'm':
+                    data['penx_cm'] = data.handx_m.astype('float') * 100
+                    data.drop('handx_m', axis=1, inplace=True)
+                elif unit == 'cm':
+                    data['penx_cm'] = data.handx_cm.astype('float') * 100
+
+            if key.startswith('handy'):
+                unit = key.split('_')[1]
+                if unit == 'm':
+                    data['peny_cm'] = data.handy_m.astype('float') * 100
+                    data.drop('handy_m', axis=1, inplace=True)
+                elif unit == 'cm':
+                    data['peny_cm'] = data.handy_cm.astype('float') * 100
 
             if key.startswith('peny'):
                 if unit == 'm':
