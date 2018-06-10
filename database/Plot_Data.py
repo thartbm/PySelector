@@ -100,7 +100,7 @@ def velocityprofile(data):
     ax.plot(interpolated_time, interpolated_speed)
     ax.axvline(data.selectedmaxvelocity, color='r', label='velocity')
     ax.axvline(data.selectedp1, color='b', label='p1')
-    ax.axvline(data.selectedp2, color='g', label='p2')
+    ax.axvline(data.selectedp2, color='b', label='p2')
     plt.close()
     return fig, max_position
 
