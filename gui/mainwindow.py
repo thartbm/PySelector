@@ -9,6 +9,9 @@ from database.Read_Data import set_data
 from database.Plot_Data import velocity_profiler, reach_profiler
 from gui import settingwindow
 import numpy as np
+import json
+from pathlib import Path
+
 
 
 class MyApp(wx.App):
@@ -22,18 +25,19 @@ class MyApp(wx.App):
 class MyFrame(wx.Frame):
     def __init__(self, parent):
         super().__init__(parent, -1, "PySelect", size=(1100, 720))
-
-
-        # Attributes
+        ## Attributes
+             # GUI
         self.parent = parent
         self.MainPanel = MainPanel(self)
         self.MainPanel.ButtonPanel.SetFocus()
         self.PopupMenu = PopupMenu(self)
+            # Variables
+        self.setting_json = Path('/Users/Ali/Desktop/Henriques/PySelector_v2/setting/settings.json')
+
 
         # Local Variables
         icon_path = os.path.join(os.getcwd(), 'gui', 'icons', 'appicon.png')
         icon = wx.Icon(icon_path, wx.BITMAP_TYPE_PNG)
-
         #closeBtn = wx.Button(MainPanel, label="Close")
         #closeBtn.Bind(wx.EVT_BUTTON, self.onClose)
 
@@ -57,6 +61,13 @@ class MyFrame(wx.Frame):
         self.MainPanel.set_settings(exp_name)
 
     def set_settingfolder(self, file):
+        with open(self.setting_json, "r+") as jsonFile:
+            data = json.load(jsonFile)
+            data["Location"] = file
+            jsonFile.seek(0)  # rewind
+            json.dump(data, jsonFile)
+            jsonFile.truncate()
+
         self.MainPanel.settingfolder = file
 
     def set_exp(self, setting_name):
@@ -84,7 +95,6 @@ class MainPanel(wx.Panel):
         self.settingfolder = os.path.join(os.getcwd(), 'setting', 'savedsettings')
         self.VelocityCanvas.mpl_connect('button_press_event',
                                         self.onVelcoityclick)
-
 
     def __setpanel(self):
         self.InfoPanel = InfoPanel(self)
@@ -247,7 +257,7 @@ class InfoPanel(wx.Panel):
         self.trial.SetLabel(str(self.current_trial) + '/' + str(self.all_trials.iloc[-1]))
 
     def set_settings(self, setting_name):
-        self.setting.SetLabel(os.path.splitext(setting_name)[0])  # don't include "json"
+        self.setting.SetLabel(os.path.splitext(setting_name)[0])
         self.parent.Refresh()
 
     def update_trial_index(self, direction):

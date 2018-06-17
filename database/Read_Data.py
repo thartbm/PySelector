@@ -4,7 +4,7 @@ import numpy as np
 import pandas as pd
 
 def set_data(data_address, setting_locator, setting_name):
-    setting_path = Path(setting_locator) / (setting_name  + '.json')
+    setting_path = Path(setting_locator) / (setting_name + '.json')
     with open(setting_path, 'r') as fp:
         setting = json.loads(fp.read())
 
