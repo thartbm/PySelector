@@ -28,11 +28,10 @@ class MyFrame(wx.Frame):
         ## Attributes
              # GUI
         self.parent = parent
+        self.setting_json = Path('/Users/Ali/Desktop/Henriques/PySelector_v2/setting/settings.json')
         self.MainPanel = MainPanel(self)
         self.MainPanel.ButtonPanel.SetFocus()
         self.PopupMenu = PopupMenu(self)
-            # Variables
-        self.setting_json = Path('/Users/Ali/Desktop/Henriques/PySelector_v2/setting/settings.json')
 
 
         # Local Variables
@@ -92,7 +91,7 @@ class MainPanel(wx.Panel):
                                            style=OK | CENTRE, pos=DefaultPosition)
         self.__setpanel()
         self.__dolayout()
-        self.settingfolder = os.path.join(os.getcwd(), 'setting', 'savedsettings')
+        self.settingfolder = json.load(open(self.parent.setting_json))['Location']
         self.VelocityCanvas.mpl_connect('button_press_event',
                                         self.onVelcoityclick)
 
