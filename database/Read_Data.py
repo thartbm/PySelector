@@ -3,6 +3,7 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
+
 def set_data(data_address, setting_locator, setting_name):
     setting_path = Path(setting_locator) / (setting_name + '.json')
     with open(setting_path, 'r') as fp:
@@ -65,7 +66,8 @@ def set_trial(trial, step_start, step_end):
 
 
 def unify_data(data, setting):
-    data.dropna(inplace=True)  # remove any rows or columns with Nan's (maybe add a special pop up for this? some notice)
+    data.dropna(
+        inplace=True)  # remove any rows or columns with Nan's (maybe add a special pop up for this? some notice)
     if setting['Display Origin'] == ['', '', '']:
         setting['Display Origin'] = [528, 395, 'px']
 
@@ -103,34 +105,25 @@ def unify_data(data, setting):
                         setting['PX_CM_Ratio'])
                     data.drop('cursory_px', axis=1, inplace=True)
 
-            if key.startswith('penx'):
-                unit = key.split('_')[1]
+            if key.startswith(('penx', 'robotx', 'mousex', 'handx')):
+                label, unit = key.split('_')
                 if unit == 'm':
-                    data['penx_cm'] = data.penx_m.astype('float') * 100
-                    data.drop('penx_m', axis=1, inplace=True)
+                    data['handx_cm'] = data[key].astype('float') * 100
+                    data.drop(key, axis=1, inplace=True)
+                elif unit == 'px':
+                    ## ("\"is not  division , tells python to read next line)
+                    data['handx_cm'] = (data[key].astype('float') - setting['Display Origin'][1]) \
+                                       * float(setting['PX_CM_Ratio'])
+                    data.drop(key, axis=1, inplace=True)
 
-            if key.startswith('peny'):
+            if key.startswith(('peny', 'roboty', 'mousey', 'handy')):
                 if unit == 'm':
-                    data['peny_cm'] = data.peny_m.astype('float') * 100
-                    data.drop('peny_m', axis=1, inplace=True)
-
-            if key.startswith('handx'):
-                unit = key.split('_')[1]
-                if unit == 'm':
-                    data['handx_cm'] = data.handx_m.astype('float') * 100
-                    data.drop('handx_m', axis=1, inplace=True)
-                elif unit == 'cm':
-                    data['handx_cm'] = data.handx_cm.astype('float') * 100
-
-            if key.startswith('handy'):
-                unit = key.split('_')[1]
-                if unit == 'm':
-                    data['handy_cm'] = data.handy_m.astype('float') * 100
-                    data.drop('handy_m', axis=1, inplace=True)
-                elif unit == 'cm':
-                    data['handy_cm'] = data.handy_cm.astype('float') * 100
-
-
+                    data['handy_cm'] = data[key].astype('float') * 100
+                    data.drop(key, axis=1, inplace=True)
+                elif unit == 'px':
+                    data['handy_cm'] = (data[key].astype('float') - setting['Display Origin'][1]) \
+                                       * float(setting['PX_CM_Ratio'])
+                    data.drop(key, axis=1, inplace=True)
 
             if key.startswith('targetx'):
                 unit = key.split('_')[1]

@@ -31,22 +31,17 @@ def velocityupdate(data):
     interpolated_speed, interpolated_time = data.Interpolated[0][selection_index] , data.Interpolated[1][selection_index]
     maxspeedidx = interpolated_speed.argmax()
     data.selectedmaxvelocity = interpolated_time[maxspeedidx]
-    if 'penx_cm' in data.keys():
-        max_position = [data.penx_cm.iloc[maxspeedidx], data.peny_cm.iloc[maxspeedidx]]
-    elif 'handx_cm' in data.keys():
-        max_position = [data.handx_cm.iloc[maxspeedidx], data.handy_cm.iloc[maxspeedidx]]
+    max_position = [data.handx_cm.iloc[maxspeedidx], data.handy_cm.iloc[maxspeedidx]]
 
     return max_position
 
 def velocityprofile(data):
     if not (hasattr(data, 'Interpolated_speed')):
         # VelocityPorfile/ Interpolate and draw
-        if 'penx_cm' in data.keys():
-            xpoly, ypoly = interp1d(data['time_ms'], data.penx_cm), interp1d(data['time_ms'], data.peny_cm)
-        elif 'handx_cm' in data.keys():
+        if 'handx_cm' in data.keys():
             xpoly, ypoly = interp1d(data['time_ms'], data.handx_cm), interp1d(data['time_ms'], data.handy_cm)
         else:
-            raise Exception('There is no hand or pen data, please check your settings')
+            raise Exception('There is no hand data, please check your settings')
 
 
         ## Time calculations
@@ -63,11 +58,8 @@ def velocityprofile(data):
         data.Interpolated = [interpolated_speed,
                              interpolated_time]  # we can treat data as-if it was passed by reference here
 
-        if 'penx_cm' in data.keys():
-            data.RealSpeed = calculate_speeds(data.penx_cm.astype('float'), data.peny_cm.astype('float'),
-                                              data['time_ms'])
-        elif 'handx_cm' in data.keys():
-            data.RealSpeed = calculate_speeds(data.handx_cm.astype('float'), data.handy_cm.astype('float'),
+
+        data.RealSpeed = calculate_speeds(data.handx_cm.astype('float'), data.handy_cm.astype('float'),
                                               data['time_ms'])
 
         max_velocity = interpolated_speed.max()
@@ -90,10 +82,7 @@ def velocityprofile(data):
                                              if [interpolated_time >= selection_starttime] and
                                              [interpolated_time <= selection_endtime]]
 
-    if 'penx_cm' in data.keys():
-        max_position = [data.penx_cm.iloc[maxspeedidx], data.peny_cm.iloc[maxspeedidx]]
-    elif 'handx_cm' in data.keys():
-        max_position = [data.handx_cm.iloc[maxspeedidx], data.handy_cm.iloc[maxspeedidx]]
+    max_position = [data.handx_cm.iloc[maxspeedidx], data.handy_cm.iloc[maxspeedidx]]
 
     fig = plt.figure(facecolor='gray', edgecolor='r')
     ax = fig.add_subplot(111)
@@ -110,11 +99,7 @@ def reachprofile(data, setting, targets):
     reachplotdata = data.loc[selected_data].copy()
     maxspeedidx = next(_ for _ , x in enumerate(reachplotdata['time_ms']) if x >= data.selectedmaxvelocity.astype('float'))
 
-    if 'penx_cm' in data.keys():
-        max_pen_position = [float(reachplotdata.penx_cm.iloc[maxspeedidx]),
-                            float(reachplotdata.peny_cm.iloc[maxspeedidx])]
-    elif 'handx_cm' in data.keys():
-        max_pen_position = [float(reachplotdata.handx_cm.iloc[maxspeedidx]),
+    max_pen_position = [float(reachplotdata.handx_cm.iloc[maxspeedidx]),
                             float(reachplotdata.handy_cm.iloc[maxspeedidx])]
 
     max_cursor_position = [float(reachplotdata.cursorx_cm.iloc[maxspeedidx]),
@@ -147,12 +132,8 @@ def reachprofile(data, setting, targets):
     ax.set_ylim([left, right])
     ax.set_xlim([left, right])
 
-    if 'penx_cm' in data.keys():
-        ax.plot(reachplotdata.penx_cm.astype('float'), reachplotdata.peny_cm.astype('float'), 'g', marker= "o",fillstyle = 'none')
-        ax.plot(reachplotdata.cursorx_cm.astype('float'), reachplotdata.cursory_cm.astype('float'), 'r')
-    elif 'handx_cm' in data.keys():
-        ax.plot(reachplotdata.handx_cm.astype('float'), reachplotdata.handy_cm.astype('float'), 'g', marker= "o", fillstyle = 'none')
-        ax.plot(reachplotdata.cursorx_cm.astype('float'), reachplotdata.cursory_cm.astype('float'), 'r')
+    ax.plot(reachplotdata.handx_cm.astype('float'), reachplotdata.handy_cm.astype('float'), 'g', marker= "o", fillstyle = 'none')
+    ax.plot(reachplotdata.cursorx_cm.astype('float'), reachplotdata.cursory_cm.astype('float'), 'r')
 
 
     for target in targets:
