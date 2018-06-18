@@ -9,46 +9,51 @@ def set_data(data_address, setting_locator, setting_name):
     with open(setting_path, 'r') as fp:
         setting = json.loads(fp.read())
 
-    if setting['Header']:
-        setting['Header'] = eval(setting['Header'])
-        for idx, item in enumerate(setting['Header']):
-            if item in ['', [], ' ', 'unused']:
-                setting['Header'][idx] = 'unused' + str(idx)
-
-        data = pd.read_csv(data_address, sep='\t', names=setting['Header'])
-        try:
-            int(data.iloc[0][0])
-        except ValueError:
-            data = pd.read_csv(data_address, sep='\t', skiprows=[0], names=setting['Header'])
-
+    if 'selected' in data_address:
+        data = pd.read_csv(data_address)
     else:
-        data = pd.read_csv(data_address, sep='\t')
+        if setting['Header']:
+            setting['Header'] = eval(setting['Header'])
+            for idx, item in enumerate(setting['Header']):
+                if item in ['', [], ' ', 'unused']:
+                    setting['Header'][idx] = 'unused' + str(idx)
 
-    unify_data(data, setting)  # this is to set the columns and units
+            data = pd.read_csv(data_address, sep='\t', names=setting['Header'])
+            try:
+                int(data.iloc[0][0])
+            except ValueError:
+                data = pd.read_csv(data_address, sep='\t', skiprows=[0], names=setting['Header'])
+
+        else:
+            data = pd.read_csv(data_address, sep='\t')
+
+        unify_data(data, setting)  # this is to set the columns and units
+
     return set_experiment(data, setting), setting
 
 
 def set_experiment(data, setting):
+
     cfg = {}
     cfg['Trial'] = {}
-    output_data = data.copy()
-    output_data_header = list(output_data.keys())
-    # for idx, item in enumerate(output_data_header):
-    #    if item.startswith('Unused'):
-    #        data.columns.values[idx] = setting['outputheaders'][idx]
-    output_data['accept'] = 0
-    output_data['max_velocity'] = 0
-    output_data['selected'] = 1
-    output_data['interpolated'] = 0
-    output_data['unsure'] = 0
     target_locations = np.unique(list(zip(list(data.targetx_cm), list(data.targety_cm))), axis=0)
     cfg['all_targets'] = target_locations
-    cfg['output'] = output_data
+    cfg['output'] = data
+
+    if hasattr(data, 'selected') == 0:
+        data['accept'] = 0
+        data['max_velocity'] = 0
+        data['selected'] = 1
+        data['interpolated'] = 0
+        data['unsure'] = 0
 
     step_start = setting['Segments'][0]
     step_end = setting['Segments'][1]
 
-    for name, group in data.groupby(['trial_no']):  ##looking through trials
+
+    for name, group in data.groupby(['trial_no']) :  ##looking through trials
+        if hasattr(group, 'accept') and np.unique(group.accept) in [1, -1]:
+                continue
         if step_start is '':
             group.selected = 1
         else:

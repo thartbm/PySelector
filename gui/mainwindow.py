@@ -201,7 +201,10 @@ class MainPanel(wx.Panel):
             self.experiment, self.setting = set_data(exp_name, self.settingfolder, self.InfoPanel.setting.GetLabel())
             self.experiment_path = os.path.abspath(os.path.join(exp_name, os.pardir))
             self.experiment_name = os.path.splitext(os.path.basename(exp_name))[0]
-            self.output_name = self.experiment_name + '_selected.csv'
+            if 'selected' in self.experiment_name:
+                self.output_name = self.experiment_name
+            else:
+                self.output_name = self.experiment_name + '_selected.csv'
             self.InfoPanel.set_exp(self.experiment_name, self.experiment)
 
     def set_trial_data(self, trial):
@@ -254,19 +257,19 @@ class InfoPanel(wx.Panel):
 
     def update(self):
         self.trial.SetLabel(str(self.current_trial) + '/' + str(self.all_trials.iloc[-1]))
+        self.set_mode()
 
     def set_settings(self, setting_name):
         self.setting.SetLabel(os.path.splitext(setting_name)[0])
         self.parent.Refresh()
 
     def update_trial_index(self, direction):
-        if isinstance(direction, int):
+        if isinstance(direction, (int, float)):
             self.current_trial = direction
             self.trial_index = np.where(self.all_trials.unique() == self.current_trial)[0][0]
         elif direction is 'up':
             self.trial_index += 1
             self.current_trial = self.all_trials.unique()[self.trial_index]
-
         elif direction is 'down':
             self.trial_index -= 1
             self.current_trial = self.all_trials.unique()[self.trial_index]
@@ -281,11 +284,13 @@ class InfoPanel(wx.Panel):
         self.all_trials = experiment['output'].trial_no
         self.trial.SetLabel(str(self.current_trial) + '/' + str(self.all_trials.iloc[-1]))
         self.parent.set_trial_data(self.current_trial)
+        self.set_mode()
 
-    def set_mode(self, accepeted):
-        if accepeted == 1:
+    def set_mode(self):
+        accepted = np.unique(self.parent.trial_data.accept)[0]
+        if accepted == 1:
             self.trial_mode.SetLabel('Accepted')
-        elif accepeted == -1:
+        elif accepted == -1:
             self.trial_mode.SetLabel('Rejected')
         else:
             self.trial_mode.SetLabel('Not_Seleted')
@@ -346,18 +351,37 @@ class ButtonPanel(wx.Panel):
 
 
     def nexttrial(self,e):
-        if self.parent.trial_data.accept.min() or self.parent.trial_data.Reject.min():
+        if self.parent.trial_data.accept.min():
             self.parent.updateoutput()
-            self.parent.InfoPanel.set_mode(0)
             self.parent.InfoPanel.update_trial_index('up')
+            self.parent.InfoPanel.set_mode()
             self.reset_buttons()
 
     def jumptotrial(self, e):
-        if self.parent.trial_data.accept.min() or self.parent.trial_data.Reject.min():
-            self.parent.updateoutput()
-            self.parent.InfoPanel.set_mode(0)
+        self.parent.updateoutput()
+        self.parent.InfoPanel.set_mode()
+        if self.Goto.GetValue():
             self.parent.InfoPanel.update_trial_index(int(self.Goto.GetValue()))
-            self.reset_buttons()
+        else:
+            output_data = self.parent.experiment['output']
+            unselected_trials = np.unique(output_data[output_data.accept == 0].trial_no)
+            unsure_trials = np.unique(output_data[output_data.unsure == 1].trial_no)
+            if unselected_trials.size & unsure_trials.size:
+                trial_index = np.min(unselected_trials + unsure_trials)
+            elif unselected_trials.size:
+                trial_index = np.min(unselected_trials)
+            elif unsure_trials.size:
+                trial_index = np.min(unsure_trials)
+            else:
+                trial_index = output_data.trial_no.max()
+
+            self.parent.InfoPanel.update_trial_index(trial_index)
+
+
+
+
+
+        self.reset_buttons()
 
     def fixp1p2(self, e):
         self.parent.Fixp1p2mode = True
@@ -366,20 +390,20 @@ class ButtonPanel(wx.Panel):
 
     def prvstrial(self, e):
         self.parent.InfoPanel.update_trial_index('down')
-        self.parent.InfoPanel.set_mode(0)
+        self.parent.InfoPanel.set_mode()
         self.reset_buttons()
 
     def deltrial(self, e):
         self.parent.trial_data['Reject'] = 1
-        self.parent.trial_data['accept'] = 0
+        self.parent.trial_data['accept'] = -1
         self.Save.SetValue(0)
-        self.parent.InfoPanel.set_mode(-1)
+        self.parent.InfoPanel.set_mode()
 
     def savetrial(self, e):
         self.parent.trial_data['accept'] = 1
-        self.parent.trial_data['Reject'] = 0
+        self.parent.trial_data['Reject'] = -1
         self.Delete.SetValue(0)
-        self.parent.InfoPanel.set_mode(1)
+        self.parent.InfoPanel.set_mode()
 
     def unsuretrial(self, e):
         self.parent.trial_data['Unsure'] = 1
@@ -449,7 +473,6 @@ class PopupMenu(wx.MenuBar):
 
     def outputdata(self, e):
         self.parent.MainPanel.outputdata()
-
 
     def getsettingfolder(self, e):
         self.folderpicker.ShowModal()
