@@ -24,7 +24,7 @@ class MyApp(wx.App):
 
 class MyFrame(wx.Frame):
     def __init__(self, parent):
-        super().__init__(parent, -1, "PySelect", size=(1100, 720))
+        super().__init__(parent, -1, "PySelect")
         ## Attributes
              # GUI
         self.parent = parent
@@ -50,11 +50,8 @@ class MyFrame(wx.Frame):
 
         self.MainPanel.Bind(wx.EVT_KEY_DOWN, self.MainPanel.ButtonPanel.keypressed)
         self.PopupMenu.Bind(wx.EVT_KEY_DOWN, self.MainPanel.ButtonPanel.keypressed)
+        self.SetSize(self.MainPanel.GetSize())
 
-    def setframesize(self):
-        MinSizeX, MinSizeY = self.MainPanel.Sizer.GetSize()
-        self.MinClientSize = (MinSizeX, MinSizeY)
-        self.ClientSize = (MinSizeX, MinSizeY)
 
     def set_settings(self, exp_name):
         self.MainPanel.set_settings(exp_name)
@@ -102,13 +99,13 @@ class MainPanel(wx.Panel):
 
     def __dolayout(self):
         MainPanelSizer = wx.GridBagSizer(10, 10)
-        MainPanelSizer.Add(self.ReachCanvas, pos=(0, 1), span=(1, 1), flag=wx.GROW)
-        MainPanelSizer.Add(self.VelocityCanvas, pos=(1, 1), span=(1, 1), flag=wx.GROW)
+        MainPanelSizer.Add(self.ReachCanvas, pos=(0, 1), span=(1, 1), flag=wx.ALIGN_CENTRE | wx.GROW)
+        MainPanelSizer.Add(self.VelocityCanvas, pos=(1, 1), span=(1, 1), flag = wx.ALIGN_CENTRE | wx.GROW)
+        MainPanelSizer.Add(self.ButtonPanel, pos=(1, 0), span=(1, 1), flag = wx.GROW)
         MainPanelSizer.Add(self.InfoPanel, pos=(0, 0), span=(1, 1), flag=wx.ALIGN_CENTRE | wx.GROW)
-        MainPanelSizer.Add(self.ButtonPanel, pos=(1, 0), flag=wx.ALIGN_CENTRE | wx.GROW)
-        MainPanelSizer.AddGrowableRow(0, 3)
-        MainPanelSizer.AddGrowableCol(1, 1)
-        MainPanelSizer.AddGrowableRow(1, 1)
+        MainPanelSizer.AddGrowableCol(1)
+        MainPanelSizer.AddGrowableRow(0)
+        MainPanelSizer.AddGrowableRow(1)
         self.SetSizerAndFit(MainPanelSizer)
 
     def __setreachplot(self):
@@ -118,10 +115,9 @@ class MainPanel(wx.Panel):
         self.ReachCanvas.draw()
 
     def __setvelocityplot(self):
-        fig = plt.figure()
-        plt.axis([0, 1, 0, 1])
+        fig = plt.figure(None,  (2,2))
+        fig.add_axes([0.1,0.3, 0.8, 0.4])
         self.VelocityCanvas = FigureCanvas(self, -1, fig)
-        self.VelocityCanvas.SetMinSize((100, 200))
 
     def __updatereachplot(self):
         # this is somewhat prone to errors, it should be fine as long as the program  runs velocity plots
@@ -253,7 +249,7 @@ class InfoPanel(wx.Panel):
 
         sizer.AddMany([settinglabel, self.setting, experimentlabel, self.experiment,
                        triallabel, self.trial, acceptedlabel,  self.trial_mode])
-        self.SetSizerAndFit(sizer)
+        self.SetSizer(sizer)
 
     def update(self):
         self.trial.SetLabel(str(self.current_trial) + '/' + str(self.all_trials.iloc[-1]))
@@ -320,7 +316,8 @@ class ButtonPanel(wx.Panel):
             (self.FixP1P2, wx.ALIGN_CENTER), (self.SetMax, wx.ALIGN_CENTER),
             goto_sizer, (self.Unsure, wx.ALIGN_CENTER),
             (self.Save, wx.ALIGN_CENTER), (self.Delete, wx.ALIGN_CENTER),
-            (self.Previous), (self.Next)])
+            (self.Previous), (self.Next)
+            ])
         self.SetSizer(self.gridSizer)
 
         self.SetMax.Value = 1
