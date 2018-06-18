@@ -113,6 +113,9 @@ def unify_data(data, setting):
                     data['handx_cm'] = (data[key].astype('float') - setting['Display Origin'][1]) \
                                        * float(setting['PX_CM_Ratio'])
                     data.drop(key, axis=1, inplace=True)
+                elif unit == 'cm':
+                    data['handx_cm'] = data[key].astype('float')
+                    data.drop(key, axis=1, inplace=True)
 
             if key.startswith(('peny', 'roboty', 'mousey', 'handy')):
                 if unit == 'm':
@@ -122,6 +125,9 @@ def unify_data(data, setting):
                     data['handy_cm'] = (data[key].astype('float') - setting['Display Origin'][1]) \
                                        * float(setting['PX_CM_Ratio'])
                     data.drop(key, axis=1, inplace=True)
+                elif unit == 'cm':
+                    data['handy_cm'] = data[key].astype('float')
+                    data.drop(key, axis=1, inplace=True)
 
             if key.startswith('targetx'):
                 unit = key.split('_')[1]
@@ -129,6 +135,9 @@ def unify_data(data, setting):
                     data['targetx_cm'] = (data.targetx_px.astype('float') - setting['Display Origin'][0]) * float(
                         setting['PX_CM_Ratio'])
                     data.drop('targetx_px', axis=1, inplace=True)
+                elif unit == 'm':
+                    data['targetx_cm'] = data.targetx_m.astype('float') * 100
+                    data.drop('targetx_m', axis=1, inplace=True)
 
             if key.startswith('targety'):
                 unit = key.split('_')[1]
@@ -136,3 +145,6 @@ def unify_data(data, setting):
                     data['targety_cm'] = (data.targety_px.astype('float') - setting['Display Origin'][1]) * float(
                         setting['PX_CM_Ratio'])
                     data.drop('targety_px', axis=1, inplace=True)
+                elif unit == 'm':
+                    data['targety_cm'] = data.targety_m.astype('float') * 100
+                    data.drop('targety_m', axis=1, inplace=True)
