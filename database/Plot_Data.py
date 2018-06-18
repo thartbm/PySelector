@@ -132,7 +132,7 @@ def reachprofile(data, setting, targets):
     ax.set_ylim([left, right])
     ax.set_xlim([left, right])
 
-    ax.plot(reachplotdata.handx_cm.astype('float'), reachplotdata.handy_cm.astype('float'), 'g', marker= "o", fillstyle = 'none')
+    ax.plot(reachplotdata.handx_cm.astype('float'), reachplotdata.handy_cm.astype('float'), 'g', linestyle= ' ', marker="o", fillstyle='none')
     ax.plot(reachplotdata.cursorx_cm.astype('float'), reachplotdata.cursory_cm.astype('float'), 'r')
 
 

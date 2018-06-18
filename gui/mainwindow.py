@@ -339,7 +339,6 @@ class ButtonPanel(wx.Panel):
 
         self.Bind(wx.EVT_KEY_DOWN, self.keypressed)
 
-
     def keypressed(self, e):
         if e.KeyCode == wx.WXK_RIGHT:
             self.nexttrial(e)
@@ -347,8 +346,6 @@ class ButtonPanel(wx.Panel):
             self.prvstrial(e)
         elif e.KeyCode == wx.WXK_DOWN:
             self.savetrial(e)
-
-
 
     def nexttrial(self,e):
         if self.parent.trial_data.accept.min():
@@ -376,10 +373,6 @@ class ButtonPanel(wx.Panel):
                 trial_index = output_data.trial_no.max()
 
             self.parent.InfoPanel.update_trial_index(trial_index)
-
-
-
-
 
         self.reset_buttons()
 
