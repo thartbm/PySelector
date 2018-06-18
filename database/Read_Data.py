@@ -55,24 +55,17 @@ def set_experiment(data, setting):
         if hasattr(group, 'accept') and np.unique(group.accept) in [1, -1]:
                 continue
         if step_start is '':
-            group.selected = 1
+            data.loc[group.index, 'selected'] = 1
         else:
             step_start = int(step_start)
             step_end = int(step_end)
-            cfg['Trial'][name] = set_trial(group, step_start, step_end)
+            indices = group[group.step.between(int(step_start,step_end))].index
+            data.loc[indices, 'selected'] =1
 
     return cfg
 
-
-def set_trial(trial, step_start, step_end):
-    segment = trial.index[trial.step.between(int(step_start), int(step_end))]
-    trial.loc[segment, 'selected'] = 1
-    return trial
-
-
 def unify_data(data, setting):
-    data.dropna(
-        inplace=True)  # remove any rows or columns with Nan's (maybe add a special pop up for this? some notice)
+    data.dropna(inplace=True)  # remove any rows or columns with Nan's (maybe add a special pop up for this? some notice)
     if setting['Display Origin'] == ['', '', '']:
         setting['Display Origin'] = [528, 395, 'px']
 

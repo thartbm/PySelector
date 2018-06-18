@@ -34,9 +34,6 @@ class MyFrame(wx.Frame):
         # Local Variables
         icon_path = os.path.join(os.getcwd(), 'gui', 'icons', 'appicon.png')
         icon = wx.Icon(icon_path, wx.BITMAP_TYPE_PNG)
-        #closeBtn = wx.Button(MainPanel, label="Close")
-        #closeBtn.Bind(wx.EVT_BUTTON, self.onClose)
-
 
         # Actions
         self.SetMenuBar(self.PopupMenu)
@@ -121,7 +118,7 @@ class MainPanel(wx.Panel):
         # before reach plots though as it does now.
         selection = self.trial_data.index[self.trial_data.time_ms.between(self.trial_data.selectedp1, self.trial_data.selectedp2)]
         self.trial_data.selected = 0
-        self.trial_data.selected.loc[selection] = 1
+        self.trial_data.loc[selection,'selected'] = 1
         fig = reach_profiler(self.trial_data, self.setting, self.experiment['all_targets'])
         fig.gca().set_aspect('auto')
 
@@ -140,9 +137,6 @@ class MainPanel(wx.Panel):
             if ~(self.trial_data.selectedp1 <= self.trial_data.selectedmaxvelocity <= self.trial_data.selectedp2):
                     self.max_position = velocity_profiler(self.trial_data, 'update')
                     self.VelocityCanvas.figure.get_axes()[0].get_children()[1].set_xdata(self.trial_data.selectedmaxvelocity)
-
-            #start_idx = self.trial_data.loc[lambda df: df.time_ms > self.trial_data['P1'].max(), :].index.min()
-            #end_idx = self.trial_data.loc[lambda df: df.time_ms > self.trial_data['P2'].max(), :].index.min
             self.VelocityCanvas.figure.gca().set_aspect('auto')
             self.VelocityCanvas.draw()
 

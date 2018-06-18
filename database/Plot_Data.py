@@ -20,7 +20,6 @@ def velocity_profiler(data, velocity_choice):
 def reach_profiler(data, setting, targets):
     return reachprofile(data, setting , targets)
 
-
 def velocityupdate(data):
     start_time = data.selectedp1
     end_time = data.selectedp2
@@ -29,7 +28,6 @@ def velocityupdate(data):
     maxspeedidx = interpolated_speed.argmax()
     data.selectedmaxvelocity = interpolated_time[maxspeedidx]
     max_position = [data.handx_cm.iloc[maxspeedidx], data.handy_cm.iloc[maxspeedidx]]
-
     return max_position
 
 def velocityprofile(data):
@@ -39,7 +37,6 @@ def velocityprofile(data):
             xpoly, ypoly = interp1d(data['time_ms'], data.handx_cm), interp1d(data['time_ms'], data.handy_cm)
         else:
             raise Exception('There is no hand data, please check your settings')
-
 
         ## Time calculations
         interpolated_time = np.linspace(data['time_ms'].iloc[0], data['time_ms'].iloc[-1], num=20, endpoint=True)
