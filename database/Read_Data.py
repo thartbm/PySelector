@@ -59,7 +59,7 @@ def set_experiment(data, setting):
         else:
             step_start = int(step_start)
             step_end = int(step_end)
-            indices = group[group.step.between(int(step_start,step_end))].index
+            indices = group[group.step.between(int(step_start), int(step_end))].index
             data.loc[indices, 'selected'] =1
 
     return cfg
@@ -69,7 +69,7 @@ def unify_data(data, setting):
     if setting['Display Origin'] == ['', '', '']:
         setting['Display Origin'] = [528, 395, 'px']
 
-    if ~ len(setting['Header']) == len(data.columns):
+    if setting['Header'] and ~ len(setting['Header']) == len(data.columns):
         assert ('Header columns and data columns do not match')
 
     else:
