@@ -1,8 +1,5 @@
 import wx, os
 from wx import *
-import matplotlib
-
-matplotlib.use('WXAgg')
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_wxagg import FigureCanvasWxAgg as FigureCanvas
 from database.Read_Data import set_data

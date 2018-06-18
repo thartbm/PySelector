@@ -1,8 +1,5 @@
 from scipy.interpolate import interp1d
 from scipy import signal
-import matplotlib
-
-matplotlib.use('WXAgg')
 from matplotlib import pyplot as plt
 import matplotlib.patches as patches
 import numpy as np

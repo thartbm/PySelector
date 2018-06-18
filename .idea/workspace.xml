@@ -25,11 +25,11 @@
     <SUITE FILE_PATH="coverage/PySelect_V1$Main.coverage" NAME="Main Coverage Results" MODIFIED="1511292021424" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/PySelect_V1$database.coverage" NAME="database Coverage Results" MODIFIED="1509807835163" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/database" />
     <SUITE FILE_PATH="coverage/PySelect_V1$simulation.coverage" NAME="simulation Coverage Results" MODIFIED="1509999169336" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/gui" />
-    <SUITE FILE_PATH="coverage/PySelector_v2$Main.coverage" NAME="Main Coverage Results" MODIFIED="1529286192929" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/PySelector_v2$Main.coverage" NAME="Main Coverage Results" MODIFIED="1529286378418" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="Main.py" pinned="false" current-in-tab="false">
+      <file leaf-file-name="Main.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/Main.py">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="0">
@@ -39,14 +39,12 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="mainwindow.py" pinned="false" current-in-tab="true">
+      <file leaf-file-name="mainwindow.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/gui/mainwindow.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="154">
-              <caret line="107" column="39" lean-forward="false" selection-start-line="107" selection-start-column="39" selection-end-line="107" selection-end-column="39" />
-              <folding>
-                <element signature="e#0#13#0" expanded="true" />
-              </folding>
+            <state relative-caret-position="15">
+              <caret line="1" column="17" lean-forward="true" selection-start-line="1" selection-start-column="0" selection-end-line="2" selection-end-column="0" />
+              <folding />
             </state>
           </provider>
         </entry>
@@ -54,7 +52,7 @@
       <file leaf-file-name="Read_Data.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/database/Read_Data.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="148">
+            <state relative-caret-position="930">
               <caret line="62" column="0" lean-forward="true" selection-start-line="62" selection-start-column="0" selection-end-line="62" selection-end-column="0" />
               <folding>
                 <element signature="e#0#11#0" expanded="true" />
@@ -66,11 +64,9 @@
       <file leaf-file-name="Plot_Data.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/database/Plot_Data.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="844">
-              <caret line="87" column="9" lean-forward="false" selection-start-line="87" selection-start-column="9" selection-end-line="87" selection-end-column="9" />
-              <folding>
-                <element signature="e#0#38#0" expanded="true" />
-              </folding>
+            <state relative-caret-position="30">
+              <caret line="2" column="0" lean-forward="false" selection-start-line="2" selection-start-column="0" selection-end-line="2" selection-end-column="0" />
+              <folding />
             </state>
           </provider>
         </entry>
@@ -114,8 +110,8 @@
       <find>velocit</find>
       <find>rc</find>
       <find>print</find>
-      <find>next</find>
       <find>marker</find>
+      <find>next</find>
       <find>row</find>
     </findStrings>
     <replaceStrings>
@@ -439,17 +435,17 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/database/Plot_Data.py</url>
-          <line>29</line>
+          <line>26</line>
           <option name="timeStamp" value="273" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/gui/mainwindow.py</url>
-          <line>136</line>
+          <line>133</line>
           <option name="timeStamp" value="274" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/gui/mainwindow.py</url>
-          <line>130</line>
+          <line>127</line>
           <option name="timeStamp" value="275" />
         </line-breakpoint>
       </breakpoints>
@@ -468,8 +464,6 @@
     <watches-manager />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/MainWindow.py" />
-    <entry file="file://$PROJECT_DIR$/dataanalyzer.py" />
     <entry file="file://$PROJECT_DIR$/dataprocessor.py" />
     <entry file="file://$PROJECT_DIR$/Gui.py" />
     <entry file="file://$PROJECT_DIR$/database.py" />
@@ -612,14 +606,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/Main.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$USER_HOME$/miniconda3/python.app/Contents/lib/python3.6/site-packages/matplotlib/axis.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="146">
@@ -628,9 +614,33 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$USER_HOME$/miniconda3/python.app/Contents/lib/python3.6/site-packages/matplotlib/backends/backend_wx.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="136">
+          <caret line="1707" column="0" lean-forward="false" selection-start-line="1707" selection-start-column="0" selection-end-line="1707" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$USER_HOME$/miniconda3/python.app/Contents/lib/python3.6/site-packages/matplotlib/backend_bases.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="4180">
+          <caret line="3025" column="0" lean-forward="false" selection-start-line="3025" selection-start-column="0" selection-end-line="3025" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/database/Plot_Data.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="30">
+          <caret line="2" column="0" lean-forward="false" selection-start-line="2" selection-start-column="0" selection-end-line="2" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/database/Read_Data.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="148">
+        <state relative-caret-position="930">
           <caret line="62" column="0" lean-forward="true" selection-start-line="62" selection-start-column="0" selection-end-line="62" selection-end-column="0" />
           <folding>
             <element signature="e#0#11#0" expanded="true" />
@@ -638,23 +648,19 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/database/Plot_Data.py">
+    <entry file="file://$PROJECT_DIR$/gui/mainwindow.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="844">
-          <caret line="87" column="9" lean-forward="false" selection-start-line="87" selection-start-column="9" selection-end-line="87" selection-end-column="9" />
-          <folding>
-            <element signature="e#0#38#0" expanded="true" />
-          </folding>
+        <state relative-caret-position="15">
+          <caret line="1" column="17" lean-forward="true" selection-start-line="1" selection-start-column="0" selection-end-line="2" selection-end-column="0" />
+          <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/gui/mainwindow.py">
+    <entry file="file://$PROJECT_DIR$/Main.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="154">
-          <caret line="107" column="39" lean-forward="false" selection-start-line="107" selection-start-column="39" selection-end-line="107" selection-end-column="39" />
-          <folding>
-            <element signature="e#0#13#0" expanded="true" />
-          </folding>
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
         </state>
       </provider>
     </entry>
