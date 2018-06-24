@@ -44,7 +44,7 @@ class MyFrame(wx.Frame):
 
         self.MainPanel.Bind(wx.EVT_KEY_DOWN, self.MainPanel.ButtonPanel.keypressed)
         self.PopupMenu.Bind(wx.EVT_KEY_DOWN, self.MainPanel.ButtonPanel.keypressed)
-        self.SetSize(self.MainPanel.GetSize())
+
 
 
     def set_settings(self, exp_name):
@@ -62,7 +62,10 @@ class MyFrame(wx.Frame):
 
     def set_exp(self, setting_name):
         self.MainPanel.set_exp(setting_name)
-
+    
+    def set_size(self, size):
+        self.SetSize(size) 
+               
     def OnClose(self, event):
         self.Destroy()
         exit()
@@ -101,6 +104,7 @@ class MainPanel(wx.Panel):
         MainPanelSizer.AddGrowableRow(0)
         MainPanelSizer.AddGrowableRow(1)
         self.SetSizerAndFit(MainPanelSizer)
+        self.parent.set_size(self.Size)
 
     def __setreachplot(self):
         fig = plt.figure()
@@ -109,7 +113,7 @@ class MainPanel(wx.Panel):
         self.ReachCanvas.draw()
 
     def __setvelocityplot(self):
-        fig = plt.figure(None,  (2,2))
+        fig = plt.figure()
         fig.add_axes([0.1, 0.3, 0.8, 0.4])
         self.VelocityCanvas = FigureCanvas(self, -1, fig)
 
@@ -201,7 +205,8 @@ class MainPanel(wx.Panel):
         self.__updatevelocityplot()
         self.__updatereachplot()
         self.InfoPanel.update()
-        self.Layout()
+        self.__dolayout()
+
 
     def updateoutput(self):
         maxvel_idx = next(x[0] for x in enumerate(self.trial_data.time_ms) if x[1] >= self.trial_data.selectedmaxvelocity)

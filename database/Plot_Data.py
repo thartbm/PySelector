@@ -94,7 +94,7 @@ def velocityprofile(data):
     max_position = [data.handx_cm.iloc[maxspeedidx], data.handy_cm.iloc[maxspeedidx]]
 
 
-    fig = plt.figure(figsize=(2, 2), facecolor='gray', edgecolor='r')
+    fig = plt.figure(facecolor='gray', edgecolor='r')
     ax = fig.add_axes([0.1, 0.3, 0.8, 0.4])
     ax.plot(data.Interpolated[1], data.Interpolated[0])
     ax.axvline(data.selectedmaxvelocity, ymax=max(data.Interpolated[1]),  color='r', label='velocity')
