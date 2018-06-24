@@ -61,7 +61,6 @@ def velocityprofile(data):
         p1idx = np.argmax(interpolated_speed > p1_speed)
         maxspeedidx = interpolated_speed.argmax()
         p2idx = maxspeedidx + np.argmax(interpolated_speed[maxspeedidx::] <= p1_speed)
-
         if p2idx == maxspeedidx:
             p2idx = -1
 
@@ -72,18 +71,34 @@ def velocityprofile(data):
     selection_starttime = data[data.selected == 1].iloc[0].time_ms
     selection_endtime = data[data.selected == 1].iloc[-1].time_ms
 
-    interpolated_speed, interpolated_time  = [_ for _ in (data.Interpolated[0], data.Interpolated[1])
-                                             if [interpolated_time >= selection_starttime] and
-                                             [interpolated_time <= selection_endtime]]
+    interpolated_time = data.Interpolated[1][(data.Interpolated[1] > selection_starttime) & (data.Interpolated[1] < selection_endtime)]
+    interpolated_speed = data.Interpolated[0][(data.Interpolated[1] > selection_starttime) & (data.Interpolated[1] < selection_endtime)]
+    interpolated_selected_idx = np.where((data.Interpolated[1] > selection_starttime) & (data.Interpolated[1] < selection_endtime))
 
+    maxspeed = interpolated_speed.max()
+    maxspeedidx = np.where(data.Interpolated[0] == maxspeed)[0][0]
+    data.selectedmaxvelocity = data.Interpolated[1][maxspeedidx]
+
+    p1_speed = max_velocity * 0.1
+    p1_speed = interpolated_speed[interpolated_speed > p1_speed][0]
+    if p1_speed == maxspeed:
+        p1_idx = maxspeedidx - 1
+    else:
+        p1_idx = np.where(data.Interpolated[0] == p1_speed)[0][0]
+    data.selectedp1 = data.Interpolated[1][p1_idx]
+    p2idx = maxspeedidx + np.argmax(data.Interpolated[0][maxspeedidx::] < p1_speed)
+    data.selectedp2 = data.Interpolated[1][p2idx]
+
+    maxspeedidx = np.where(data.time_ms >= data.selectedmaxvelocity)[0][0]
     max_position = [data.handx_cm.iloc[maxspeedidx], data.handy_cm.iloc[maxspeedidx]]
 
-    fig = plt.figure(figsize= (2,2), facecolor='gray', edgecolor='r')
+
+    fig = plt.figure(figsize=(2, 2), facecolor='gray', edgecolor='r')
     ax = fig.add_axes([0.1, 0.3, 0.8, 0.4])
-    ax.plot(interpolated_time, interpolated_speed)
-    ax.axvline(data.selectedmaxvelocity, color='r', label='velocity')
-    ax.axvline(data.selectedp1, color='b', label='p1')
-    ax.axvline(data.selectedp2, color='b', label='p2')
+    ax.plot(data.Interpolated[1], data.Interpolated[0])
+    ax.axvline(data.selectedmaxvelocity, ymax=max(data.Interpolated[1]),  color='r', label='velocity')
+    ax.axvline(data.selectedp1, ymax=max(data.Interpolated[1]), color='b', label='p1')
+    ax.axvline(data.selectedp2, ymax=max(data.Interpolated[1]), color='b', label='p2')
     plt.close()
     return fig, max_position
 
@@ -91,7 +106,7 @@ def velocityprofile(data):
 def reachprofile(data, setting, targets):
     selected_data = data.index[data.selected == 1].tolist()
     reachplotdata = data.loc[selected_data].copy()
-    maxspeedidx = next(_ for _ , x in enumerate(reachplotdata['time_ms']) if x >= data.selectedmaxvelocity.astype('float'))
+    maxspeedidx = next(_ for _, x in enumerate(reachplotdata['time_ms']) if x >= data.selectedmaxvelocity.astype('float'))
 
     max_pen_position = [float(reachplotdata.handx_cm.iloc[maxspeedidx]),
                             float(reachplotdata.handy_cm.iloc[maxspeedidx])]

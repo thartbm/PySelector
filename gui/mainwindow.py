@@ -110,18 +110,16 @@ class MainPanel(wx.Panel):
 
     def __setvelocityplot(self):
         fig = plt.figure(None,  (2,2))
-        fig.add_axes([0.1,0.3, 0.8, 0.4])
+        fig.add_axes([0.1, 0.3, 0.8, 0.4])
         self.VelocityCanvas = FigureCanvas(self, -1, fig)
 
     def __updatereachplot(self):
         # this is somewhat prone to errors, it should be fine as long as the program  runs velocity plots
         # before reach plots though as it does now.
         selection = self.trial_data.index[self.trial_data.time_ms.between(self.trial_data.selectedp1, self.trial_data.selectedp2)]
-        self.trial_data.selected = 0
-        self.trial_data.loc[selection,'selected'] = 1
+        self.trial_data.loc[selection, 'selected'] = 1
         fig = reach_profiler(self.trial_data, self.setting, self.experiment['all_targets'])
         fig.gca().set_aspect('auto')
-
         self.ReachCanvas.figure = fig
         self.ReachCanvas.draw()
 

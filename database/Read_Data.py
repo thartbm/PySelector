@@ -43,7 +43,7 @@ def set_experiment(data, setting):
     if hasattr(data, 'selected') == 0:
         data['accept'] = 0
         data['max_velocity'] = 0
-        data['selected'] = 1
+        data['selected'] = 0
         data['interpolated'] = 0
         data['unsure'] = 0
 
@@ -60,7 +60,7 @@ def set_experiment(data, setting):
             step_start = int(step_start)
             step_end = int(step_end)
             indices = group[group.step.between(int(step_start), int(step_end))].index
-            data.loc[indices, 'selected'] =1
+            data.loc[indices, 'selected'] = 1
 
     return cfg
 
