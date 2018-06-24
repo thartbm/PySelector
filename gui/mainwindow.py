@@ -103,7 +103,7 @@ class MainPanel(wx.Panel):
         MainPanelSizer.AddGrowableCol(1)
         MainPanelSizer.AddGrowableRow(0)
         MainPanelSizer.AddGrowableRow(1)
-        self.SetSizerAndFit(MainPanelSizer)
+        self.SetSizer(MainPanelSizer)
         self.parent.set_size(self.Size)
 
     def __setreachplot(self):
