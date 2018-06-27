@@ -39,7 +39,7 @@ def velocityprofile(data):
             raise Exception('There is no hand data, please check your settings')
 
         ## Time calculations
-        interpolated_time = np.linspace(data['time_ms'].iloc[0], data['time_ms'].iloc[-1], num=20, endpoint=True)
+        interpolated_time = np.linspace(data['time_ms'].iloc[0], data['time_ms'].iloc[-1],  endpoint=True)
         xpoly, ypoly = xpoly(interpolated_time), ypoly(interpolated_time)
 
         nyquist = data['time_ms'].diff().mean()
@@ -60,10 +60,7 @@ def velocityprofile(data):
         p1_speed = max_velocity * 0.1
         p1idx = np.argmax(interpolated_speed > p1_speed)
         maxspeedidx = interpolated_speed.argmax()
-        p2idx = maxspeedidx + np.argmax(interpolated_speed[maxspeedidx::] <= p1_speed)
-        if p2idx == maxspeedidx:
-            p2idx = -1
-
+        p2idx = maxspeedidx+1 + np.argmax(interpolated_speed[maxspeedidx+1::] <= p1_speed)
         data.selectedp1 = interpolated_time[p1idx]
         data.selectedp2 = interpolated_time[p2idx]
         data.selectedmaxvelocity =interpolated_time[maxspeedidx]
@@ -96,7 +93,7 @@ def velocityprofile(data):
 
     fig = plt.figure(facecolor='gray', edgecolor='r')
     ax = fig.add_axes([0.1, 0.3, 0.8, 0.4])
-    ax.plot(data.Interpolated[1], data.Interpolated[0])
+    ax.plot(interpolated_time, interpolated_speed)
     ax.axvline(data.selectedmaxvelocity, ymax=max(data.Interpolated[1]),  color='r', label='velocity')
     ax.axvline(data.selectedp1, ymax=max(data.Interpolated[1]), color='b', label='p1')
     ax.axvline(data.selectedp2, ymax=max(data.Interpolated[1]), color='b', label='p2')
