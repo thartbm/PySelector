@@ -107,3 +107,4 @@ Test_Data/1_4__time_model_reachselected
 *.xml
 setting/settings.json
 *.xml
+*.json

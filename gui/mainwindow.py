@@ -103,7 +103,7 @@ class MainPanel(wx.Panel):
         MainPanelSizer.AddGrowableCol(1)
         MainPanelSizer.AddGrowableRow(0)
         MainPanelSizer.AddGrowableRow(1)
-        self.SetSizer(MainPanelSizer)
+        self.SetSizerAndFit(MainPanelSizer)
         self.parent.set_size(self.Size)
 
     def __setreachplot(self):
@@ -115,6 +115,7 @@ class MainPanel(wx.Panel):
     def __setvelocityplot(self):
         fig = plt.figure()
         fig.add_axes([0.1, 0.3, 0.8, 0.4])
+        fig.set_size_inches(3,3)
         self.VelocityCanvas = FigureCanvas(self, -1, fig)
 
     def __updatereachplot(self):
@@ -205,6 +206,7 @@ class MainPanel(wx.Panel):
         self.__updatevelocityplot()
         self.__updatereachplot()
         self.InfoPanel.update()
+        self.Fit()
         self.Layout()
 
     def updateoutput(self):
