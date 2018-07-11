@@ -3,6 +3,9 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/PySelect_V1.iml" filepath="$PROJECT_DIR$/.idea/PySelect_V1.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../../Personal_Projects/Web_Development/Tengaged/Spamming/.idea/Spamming.iml" filepath="$PROJECT_DIR$/../../Personal_Projects/Web_Development/Tengaged/Spamming/.idea/Spamming.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../../Personal_Projects/Web_Development/django/.idea/django.iml" filepath="$PROJECT_DIR$/../../Personal_Projects/Web_Development/django/.idea/django.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../../Personal_Projects/Web_Development/Tengaged/www.tengagedblade.com/.idea/www.tengagedblade.com.iml" filepath="$PROJECT_DIR$/../../Personal_Projects/Web_Development/Tengaged/www.tengagedblade.com/.idea/www.tengagedblade.com.iml" />
     </modules>
   </component>
 </project>

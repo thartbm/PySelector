@@ -25,5 +25,5 @@ setup(
     author='Alireza Tajadod',
     author_email='ATajadod94@gmail.com',
     description='Selection Gui for Preprocessing motor-control data',
-    install_requires = ['wxpython','pandas','matplotlib','numpy','scipy']
+    install_requires = ['wxpython','pandas','matplotlib','numpy','scipy', 'pathlib']
 )
