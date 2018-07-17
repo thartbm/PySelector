@@ -79,10 +79,10 @@ def unify_data(data, setting):
                 unit = key.split('_')[1]
                 if unit != 'ms':
                     if unit == 's':
-                        data['time_ms'] = data.time_s.astype('float') * 1000
+                        data.insert(data.columns.get_loc['time_s'], 'time_ms', data.time_s.astype('float') * 1000)
                         data.drop('time_s', axis=1, inplace=True)
                     elif unit == 'm':
-                        data['time_ms'] = data.time_m.astype('float') / 60000
+                        data.insert(data.columns.get_loc['time_m'], 'time_ms', data.time_m.astype('float') / 60000)
                         data.drop('time_m', axis=1, inplace=True)
                     else:
                         assert ('I don''t know how to handle this unit for time:  ' + unit)
@@ -92,59 +92,74 @@ def unify_data(data, setting):
             if key.startswith('cursorx'):
                 unit = key.split('_')[1]
                 if unit == 'px':
-                    data['cursorx_cm'] = (data.cursorx_px.astype('float') - setting['Display Origin'][0]) * float(
-                        setting['PX_CM_Ratio'])
-                    data.drop('cursorx_px', axis=1, inplace=True)
+                    data.insert(data.columns.get_loc(key), 'cursorx_cm',
+                                (data.cursorx_px.astype('float') - setting['Display Origin'][0]) * float(
+                                          setting['PX_CM_Ratio']))
+                    data.drop(key, axis=1, inplace=True)
 
             if key.startswith('cursory'):
                 unit = key.split('_')[1]
                 if unit == 'px':
-                    data['cursory_cm'] = (data.cursory_px.astype('float') - setting['Display Origin'][1]) * float(
-                        setting['PX_CM_Ratio'])
+                    data.insert(data.columns.get_loc(key), 'cursory_cm',
+                                (data.cursory_px.astype('float') - setting['Display Origin'][1]) * float(
+                                    setting['PX_CM_Ratio']))
                     data.drop('cursory_px', axis=1, inplace=True)
 
             if key.startswith(('penx', 'robotx', 'mousex', 'handx')):
                 label, unit = key.split('_')
                 if unit == 'm':
-                    data['handx_cm'] = data[key].astype('float') * 100
+                    data.insert(data.columns.get_loc(key), 'handx_cm',
+                                data[key].astype('float') * 100)
                     data.drop(key, axis=1, inplace=True)
                 elif unit == 'px':
                     ## ("\"is not  division , tells python to read next line)
+                    data.insert(data.columns.get_loc(key), 'handx_cm',
+                                (data.cursory_px.astype('float') - setting['Display Origin'][1]) * float(
+                                    setting['PX_CM_Ratio']))
                     data['handx_cm'] = (data[key].astype('float') - setting['Display Origin'][1]) \
-                                       * float(setting['PX_CM_Ratio'])
+                                            * float(setting['PX_CM_Ratio'])
                     data.drop(key, axis=1, inplace=True)
                 elif unit == 'cm':
                     data['handx_cm'] = data[key].astype('float')
-                    data.drop(key, axis=1, inplace=True)
 
             if key.startswith(('peny', 'roboty', 'mousey', 'handy')):
                 if unit == 'm':
-                    data['handy_cm'] = data[key].astype('float') * 100
+                    data.insert(data.columns.get_loc(key), 'handy_cm',
+                                data[key].astype('float') * 100)
                     data.drop(key, axis=1, inplace=True)
                 elif unit == 'px':
-                    data['handy_cm'] = (data[key].astype('float') - setting['Display Origin'][1]) \
-                                       * float(setting['PX_CM_Ratio'])
+                    data.insert(data.columns.get_loc(key), 'handy_cm',
+                                (data[key].astype('float') - setting['Display Origin'][1])
+                                * float(setting['PX_CM_Ratio']))
                     data.drop(key, axis=1, inplace=True)
                 elif unit == 'cm':
-                    data['handy_cm'] = data[key].astype('float')
-                    data.drop(key, axis=1, inplace=True)
+                    data[key] = data[key].astype('float')
 
             if key.startswith('targetx'):
                 unit = key.split('_')[1]
                 if unit == 'px':
-                    data['targetx_cm'] = (data.targetx_px.astype('float') - setting['Display Origin'][0]) * float(
-                        setting['PX_CM_Ratio'])
+                    data.insert(data.columns.get_loc(key), 'targetx_cm',
+                                (data.targetx_px.astype('float') - setting['Display Origin'][0]) * float(
+                                    setting['PX_CM_Ratio']))
                     data.drop('targetx_px', axis=1, inplace=True)
                 elif unit == 'm':
-                    data['targetx_cm'] = data.targetx_m.astype('float') * 100
-                    data.drop('targetx_m', axis=1, inplace=True)
+                    data.insert(data.columns.get_loc(key), 'targetx_cm',
+                                data[key].astype('float') * 100)
+                    data.drop(key, axis=1, inplace=True)
+                elif unit == 'cm':
+                    data[key] = data[key].astype('float')
 
             if key.startswith('targety'):
                 unit = key.split('_')[1]
                 if unit == 'px':
-                    data['targety_cm'] = (data.targety_px.astype('float') - setting['Display Origin'][1]) * float(
-                        setting['PX_CM_Ratio'])
+                    data.insert(data.columns.get_loc(key), 'targety_cm',
+                                (data.targety_px.astype('float') - setting['Display Origin'][1]) * float(
+                                    setting['PX_CM_Ratio']))
                     data.drop('targety_px', axis=1, inplace=True)
+
                 elif unit == 'm':
-                    data['targety_cm'] = data.targety_m.astype('float') * 100
-                    data.drop('targety_m', axis=1, inplace=True)
+                    data.insert(data.columns.get_loc(key), 'targety_cm',
+                                data[key].astype('float') * 100)
+                    data.drop(key, axis=1, inplace=True)
+                elif unit == 'cm':
+                    data[key] = data[key].astype('float')
