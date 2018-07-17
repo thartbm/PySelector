@@ -64,6 +64,10 @@ def velocityprofile(data):
         data.selectedp1 = interpolated_time[p1idx]
         data.selectedp2 = interpolated_time[p2idx]
         data.selectedmaxvelocity =interpolated_time[maxspeedidx]
+        data.selected = 0
+        selectedindex = (data['time_ms'] >= data.selectedp1) & (data['time_ms'] <= data.selectedp2)
+        data.selected[selectedindex] = 1
+
 
     selection_starttime = data[data.selected == 1].iloc[0].time_ms
     selection_endtime = data[data.selected == 1].iloc[-1].time_ms
@@ -76,15 +80,19 @@ def velocityprofile(data):
     maxspeedidx = np.where(data.Interpolated[0] == maxspeed)[0][0]
     data.selectedmaxvelocity = data.Interpolated[1][maxspeedidx]
 
-    p1_speed = max_velocity * 0.1
-    p1_speed = interpolated_speed[interpolated_speed > p1_speed][0]
+    p1_speed = data.selectedmaxvelocity * 0.1
+    try:
+        p1_speed = interpolated_speed[interpolated_speed > p1_speed][0]
+    except(IndexError):
+        p1_speed = interpolated_speed[0]
+
     if p1_speed == maxspeed:
         p1_idx = maxspeedidx - 1
     else:
         p1_idx = np.where(data.Interpolated[0] == p1_speed)[0][0]
 
     data.selectedp1 = data.Interpolated[1][p1_idx]
-    p2idx = maxspeedidx+1 + np.argmax(data.Interpolated[0][maxspeedidx+1::] < p1_speed)
+    p2idx = maxspeedidx+1 + np.argmax(data.Interpolated[0][maxspeedidx+1::] < maxspeed * 0.1)
     data.selectedp2 = data.Interpolated[1][p2idx]
 
     maxspeedidx = np.where(data.time_ms >= data.selectedmaxvelocity)[0][0]
@@ -94,7 +102,7 @@ def velocityprofile(data):
     fig = plt.figure(facecolor='gray', edgecolor='r')
     ax =fig.add_axes([0.1, 0.2,0.8, 0.6])
 
-    ax.plot(interpolated_time, interpolated_speed)
+    ax.plot(data.Interpolated[1], data.Interpolated[0])
     ax.axvline(data.selectedmaxvelocity, ymax=max(data.Interpolated[1]),  color='r', label='velocity')
     ax.axvline(data.selectedp1, ymax=max(data.Interpolated[1]), color='b', label='p1')
     ax.axvline(data.selectedp2, ymax=max(data.Interpolated[1]), color='b', label='p2')
