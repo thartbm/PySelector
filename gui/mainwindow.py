@@ -133,7 +133,10 @@ class MainPanel(wx.Panel):
             self.Fixp1p2mode = False
             self.ButtonPanel.FixP1P2.Value = 0
             self.ButtonPanel.SetMax.Value = 1
-
+            selection_index = [_ for _, val in zip(self.trial_data['time_ms'].index, self.trial_data['time_ms'])
+                            if val >= self.trial_data.selectedp1 and val <= self.trial_data.selectedp2]
+            self.trial_data.selected = 0
+            self.trial_data.selected[selection_index] = 1
             self.selected_velocity = 'pyselect'
             self.VelocityCanvas.figure.get_axes()[0].get_children()[2].set_xdata(self.trial_data.selectedp1)
             self.VelocityCanvas.figure.get_axes()[0].get_children()[3].set_xdata(self.trial_data.selectedp2)
