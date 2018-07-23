@@ -61,8 +61,8 @@ def velocityprofile(data):
         p1idx = np.argmax(interpolated_speed > p1_speed)
         maxspeedidx = interpolated_speed.argmax()
         p2idx = maxspeedidx+1 + np.argmax(interpolated_speed[maxspeedidx+1::] <= p1_speed)
-        data.selectedp1 = interpolated_time[p1idx]
-        data.selectedp2 = interpolated_time[p2idx]
+        data.selectedp1 = next(x for x in data['time_ms'] if x > interpolated_time[p1idx])
+        data.selectedp2 = next(x for x in data['time_ms'] if x > interpolated_time[p2idx])
         data.selectedmaxvelocity =interpolated_time[maxspeedidx]
         data.selected = 0
         selectedindex = (data['time_ms'] >= data.selectedp1) & (data['time_ms'] <= data.selectedp2)
@@ -91,10 +91,13 @@ def velocityprofile(data):
     else:
         p1_idx = np.where(data.Interpolated[0] == p1_speed)[0][0]
 
-    data.selectedp1 = data.Interpolated[1][p1_idx]
-    p2idx = maxspeedidx+1 + np.argmax(data.Interpolated[0][maxspeedidx+1::] < maxspeed * 0.1)
-    data.selectedp2 = data.Interpolated[1][p2idx]
-
+    data.selectedp1 = next(x for x in data['time_ms'] if x > data.Interpolated[1][p1_idx])
+    p2_idx = np.argmax(data.Interpolated[0][maxspeedidx+1::] < (maxspeed * 0.1))
+    if p2_idx == 0:
+        p2_idx = -2
+    else:
+        p2_idx += maxspeedidx+1
+    data.selectedp2 = next(x for x in data['time_ms'] if x > data.Interpolated[1][p2_idx])
     maxspeedidx = np.where(data.time_ms >= data.selectedmaxvelocity)[0][0]
     max_position = [data.handx_cm.iloc[maxspeedidx], data.handy_cm.iloc[maxspeedidx]]
 
