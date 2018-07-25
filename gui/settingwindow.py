@@ -8,12 +8,12 @@ import wx.lib.agw.gradientbutton as gbtn
 
 
 class SettingFrame(wx.Frame):
-    def __init__(self, parent):
+    def __init__(self, parent, setting_folder):
         super().__init__(parent=parent)
 
         # Attributes
         self.parent = parent
-        self.MainPanel = MainSettingPanel(self)
+        self.MainPanel = MainSettingPanel(self, setting_folder)
 
         sizer = wx.BoxSizer(wx.HORIZONTAL)
         sizer.Add(self.MainPanel, wx.GROW)
@@ -22,21 +22,19 @@ class SettingFrame(wx.Frame):
 
 
 class MainSettingPanel(wx.Panel):
-    def __init__(self, parent):
+    def __init__(self, parent, setting_folder):
         super().__init__(parent=parent)
         self.parent = parent
 
         self.settingpanel = SettingPanel(self)
-        self.settinglist = SettingsList(self)
+        self.settinglist = SettingsList(self, setting_folder)
         self.buttonpanel = SettingButtonPanel(self)
-
+        self.setting_folder = setting_folder
         sizer = wx.BoxSizer(wx.HORIZONTAL)
         sizer.Add(self.settinglist, 1, wx.GROW)
         sizer.Add(self.buttonpanel, 1, wx.GROW)
         sizer.Add(self.settingpanel, 1, wx.GROW)
         self.SetSizer(sizer)
-
-
         self.settingdata = collections.defaultdict(dict)
 
         self.buttonpanel.savebutton.Bind(EVT_BUTTON, self.save)
@@ -63,17 +61,16 @@ class MainSettingPanel(wx.Panel):
         self.settingdata['return_units'] = self.settingpanel.FindWindowById(5000).GetStringSelection()
         self.settingdata['Name'] = self.buttonpanel.expname.GetValue()
 
-        output_fname = 'setting/savedsettings/' + self.settingdata['Name'] + '.json'
+        output_fname = self.setting_folder + self.settingdata['Name'] + '.json'
         with open(output_fname, 'w') as fp:
             json.dump(self.settingdata, fp, sort_keys=True, indent=4, separators=(',', ': '))
 
         self.settinglist.refresh()
         self.Layout()
 
-    def load(self, event):
-        setting_locator = os.path.join(os.getcwd(), 'setting', 'savedsettings')
+    def load(self, e):
         selected_setting = self.settinglist.GetItem(self.settinglist.GetFocusedItem()).GetText()
-        set_name = os.path.join(setting_locator, selected_setting)
+        set_name = os.path.join(self.setting_folder, selected_setting)
         with open(set_name, 'r') as fp:
             setting = json.loads(fp.read())
 
@@ -174,17 +171,18 @@ class SettingPanel(wx.Panel):
 
 
 class SettingsList(wx.ListCtrl):
-    def __init__(self, parent):
+    def __init__(self, parent, settingfolder):
         super().__init__(parent=parent, style=wx.LC_REPORT)
         self.InsertColumn(0, "Name")
-        all_settings = [x for x in os.listdir('setting/savedsettings') if x.endswith(".json")]
+        self.settingfolder = settingfolder
+        all_settings = [x for x in os.listdir(settingfolder) if x.endswith(".json")]
         for item in all_settings:
             self.InsertItem(0, item)
 
     def refresh(self):
         #find a nicer way to do this
         self.DeleteAllItems()
-        all_settings = [x for x in os.listdir('setting/savedsettings') if x.endswith(".json")]
+        all_settings = [x for x in os.listdir(self.settingfolder) if x.endswith(".json")]
         for item in all_settings:
             self.InsertItem(0, item)
 
