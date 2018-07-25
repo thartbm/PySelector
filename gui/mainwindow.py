@@ -274,7 +274,7 @@ class InfoPanel(wx.Panel):
     def set_exp(self, exp_name, experiment):
         self.experiment.SetLabel(exp_name)
         # ====  RECODE maybe? / there has to be a nicer way of handling this
-        self.current_trial = experiment['output'].trial_no[self.trial_index]
+        self.current_trial = experiment['output'].trial_no.iloc[self.trial_index]
         self.all_trials = experiment['output'].trial_no
         self.trial.SetLabel(str(self.current_trial) + '/' + str(self.all_trials.iloc[-1]))
         self.parent.set_trial_data(self.current_trial)
@@ -444,7 +444,7 @@ class PopupMenu(wx.MenuBar):
         self.savedsettings.Bind(wx.EVT_MENU, self.choosesetting)
 
     def loadsettinggui(self, e):
-        win = settingwindow.SettingFrame(self)
+        win = settingwindow.SettingFrame(self, self.parent.MainPanel.settingfolder)
         win.Show(True)
 
     #       all_settings = [x for x in os.listdir('setting/savedsettings') if x.endswith(".json")]    # setings that already exist

@@ -22,7 +22,7 @@ def set_data(data_address, setting_locator, setting_name):
             try:
                 int(data.iloc[0][0])
             except ValueError:
-                data = pd.read_csv(data_address, sep='\t', skiprows=[0], names=setting['Header'])
+                data = data[2::]
 
         else:
             data = pd.read_csv(data_address, sep='\t')
@@ -59,7 +59,7 @@ def set_experiment(data, setting):
         else:
             step_start = int(step_start)
             step_end = int(step_end)
-            indices = group[group.step.between(int(step_start), int(step_end))].index
+            indices = group[group.step.astype(int).between(int(step_start), int(step_end))].index
             data.loc[indices, 'selected'] = 1
 
     return cfg
@@ -96,6 +96,11 @@ def unify_data(data, setting):
                                 (data.cursorx_px.astype('float') - setting['Display Origin'][0]) * float(
                                           setting['PX_CM_Ratio']))
                     data.drop(key, axis=1, inplace=True)
+                elif unit == 'cm':
+                    keyloc = data.columns.get_loc(key)
+                    mydata = data[key].astype('float')
+                    data.drop(key, axis=1, inplace=True)
+                    data.insert(keyloc, 'cursorx_cm', mydata)
 
             if key.startswith('cursory'):
                 unit = key.split('_')[1]
@@ -104,6 +109,11 @@ def unify_data(data, setting):
                                 (data.cursory_px.astype('float') - setting['Display Origin'][1]) * float(
                                     setting['PX_CM_Ratio']))
                     data.drop('cursory_px', axis=1, inplace=True)
+                elif unit == 'cm':
+                    keyloc = data.columns.get_loc(key)
+                    mydata = data[key].astype('float')
+                    data.drop(key, axis=1, inplace=True)
+                    data.insert(keyloc, 'cursory_cm', mydata)
 
             if key.startswith(('penx', 'robotx', 'mousex', 'handx')):
                 label, unit = key.split('_')
@@ -120,7 +130,10 @@ def unify_data(data, setting):
                                             * float(setting['PX_CM_Ratio'])
                     data.drop(key, axis=1, inplace=True)
                 elif unit == 'cm':
-                    data['handx_cm'] = data[key].astype('float')
+                    keyloc = data.columns.get_loc(key)
+                    mydata = data[key].astype('float')
+                    data.drop(key, axis=1, inplace=True)
+                    data.insert(keyloc, 'handx_cm', mydata)
 
             if key.startswith(('peny', 'roboty', 'mousey', 'handy')):
                 if unit == 'm':
@@ -133,7 +146,10 @@ def unify_data(data, setting):
                                 * float(setting['PX_CM_Ratio']))
                     data.drop(key, axis=1, inplace=True)
                 elif unit == 'cm':
-                    data[key] = data[key].astype('float')
+                    keyloc = data.columns.get_loc(key)
+                    mydata = data[key].astype('float')
+                    data.drop(key, axis=1, inplace=True)
+                    data.insert(keyloc, 'handy_cm', mydata)
 
             if key.startswith('targetx'):
                 unit = key.split('_')[1]
@@ -149,6 +165,7 @@ def unify_data(data, setting):
                 elif unit == 'cm':
                     data[key] = data[key].astype('float')
 
+
             if key.startswith('targety'):
                 unit = key.split('_')[1]
                 if unit == 'px':
@@ -163,3 +180,6 @@ def unify_data(data, setting):
                     data.drop(key, axis=1, inplace=True)
                 elif unit == 'cm':
                     data[key] = data[key].astype('float')
+
+            if key.startswith('step'):
+                    data[key] = data[key].astype('int')
