@@ -28,7 +28,7 @@ def set_data(data_address, setting_locator, setting_name):
         else:
             data = pd.read_csv(data_address, sep='\t')
 
-        unify_data(data, setting)  # this is to set the columns and units
+            unify_data(data, setting)  # this is to set the columns and units
 
     return set_experiment(data, setting), setting
 

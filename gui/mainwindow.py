@@ -8,7 +8,8 @@ from gui import settingwindow
 import numpy as np
 import json
 from pathlib import Path
-
+import logging
+import datetime
 
 
 class MyApp(wx.App):
@@ -68,6 +69,7 @@ class MyFrame(wx.Frame):
                
     def OnClose(self, event):
         self.Destroy()
+        logging.info('Finished')
         exit()
 
 
@@ -185,9 +187,11 @@ class MainPanel(wx.Panel):
             self.refresh()
 
     def set_settings(self, setting_name):
+        logging.info('setting_name set to %s \n', setting_name)
         self.InfoPanel.set_settings(setting_name)
 
     def set_exp(self, exp_name):
+        logging.info('exp_name set to %s \n', exp_name)
         if self.InfoPanel.setting.GetLabel() == 'None':
             self.warningmsg.ShowModal()
         else:
@@ -201,11 +205,15 @@ class MainPanel(wx.Panel):
             self.InfoPanel.set_exp(self.experiment_name, self.experiment)
 
     def set_trial_data(self, trial):
+        logging.info('=================== \n')
+        logging.info('trial set to %s \n ', trial)
+        logging.info('=================== \n')
         self.trial_data = self.experiment['output'].where(self.experiment['output'].trial_no == trial)
         self.trial_data.dropna(inplace=True)
         self.refresh()
 
     def refresh(self):
+        logging.info('REFRESH \n')
         self.__updatevelocityplot()
         self.__updatereachplot()
         self.InfoPanel.update()
@@ -478,8 +486,15 @@ class PopupMenu(wx.MenuBar):
             self.savedsettings.Append(-1, item)
 
 def run():
+    logging.basicConfig(filename='setting/mylog.log', level=logging.DEBUG, format='%(asctime)s %(message)s')
+    logging.getLogger().addHandler(logging.StreamHandler())
+    logging.info('================= \n')
+    logging.info('Started')
     app = MyApp(False)
     app.MainLoop()
+    logging.info('================= \n')
+    logging.info('Finished')
+
 
 
 
