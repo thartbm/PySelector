@@ -14,6 +14,7 @@ def set_data(data_address, setting_locator, setting_name):
     else:
         if setting['Header']:
             setting['Header'] = eval(setting['Header'])
+            assert (len(setting['Header']) == len(pd.read_csv(data_address, sep='\t').columns)), 'Column numbers do NOT match'
             for idx, item in enumerate(setting['Header']):
                 if item in ['', [], ' ', 'unused']:
                     setting['Header'][idx] = 'unused' + str(idx)

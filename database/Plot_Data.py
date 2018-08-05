@@ -62,7 +62,7 @@ def velocityprofile(data):
         maxspeedidx = interpolated_speed.argmax()
         p2idx = maxspeedidx+1 + np.argmax(interpolated_speed[maxspeedidx+1::] <= p1_speed)
         data.selectedp1 = next(x for x in data['time_ms'] if x > interpolated_time[p1idx])
-        data.selectedp2 = next(x for x in data['time_ms'] if x > interpolated_time[p2idx])
+        data.selectedp2 = next(x for x in data['time_ms'] if x >= interpolated_time[p2idx])
         data.selectedmaxvelocity =interpolated_time[maxspeedidx]
         data.selected = 0
         selectedindex = (data['time_ms'] >= data.selectedp1) & (data['time_ms'] <= data.selectedp2)
