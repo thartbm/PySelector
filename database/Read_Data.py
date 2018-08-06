@@ -14,6 +14,7 @@ def set_data(data_address, setting_locator, setting_name):
     else:
         if setting['Header']:
             setting['Header'] = eval(setting['Header'])
+            assert (len(setting['Header']) == len(pd.read_csv(data_address, sep='\t').columns)), 'Column numbers do NOT match'
             for idx, item in enumerate(setting['Header']):
                 if item in ['', [], ' ', 'unused']:
                     setting['Header'][idx] = 'unused' + str(idx)
@@ -27,7 +28,7 @@ def set_data(data_address, setting_locator, setting_name):
         else:
             data = pd.read_csv(data_address, sep='\t')
 
-        unify_data(data, setting)  # this is to set the columns and units
+            unify_data(data, setting)  # this is to set the columns and units
 
     return set_experiment(data, setting), setting
 

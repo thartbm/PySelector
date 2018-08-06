@@ -8,8 +8,7 @@ from gui import settingwindow
 import numpy as np
 import json
 from pathlib import Path
-
-
+import logging
 
 class MyApp(wx.App):
     def OnInit(self):
@@ -68,6 +67,7 @@ class MyFrame(wx.Frame):
                
     def OnClose(self, event):
         self.Destroy()
+        logging.info('Finished')
         exit()
 
 
@@ -101,6 +101,7 @@ class MainPanel(wx.Panel):
         MainPanelSizer.Add(self.ButtonPanel, pos=(1, 0), span=(1, 1), flag = wx.GROW)
         MainPanelSizer.Add(self.InfoPanel, pos=(0, 0), span=(1, 1), flag=wx.ALIGN_CENTRE | wx.GROW)
         MainPanelSizer.AddGrowableCol(1)
+        MainPanelSizer.AddGrowableCol(0)
         MainPanelSizer.AddGrowableRow(0)
         MainPanelSizer.AddGrowableRow(1)
         self.SetSizerAndFit(MainPanelSizer)
@@ -140,9 +141,13 @@ class MainPanel(wx.Panel):
             self.selected_velocity = 'pyselect'
             self.VelocityCanvas.figure.get_axes()[0].get_children()[2].set_xdata(self.trial_data.selectedp1)
             self.VelocityCanvas.figure.get_axes()[0].get_children()[3].set_xdata(self.trial_data.selectedp2)
+            logging.debug('p1 value on fixp1p2: {}'.format(self.trial_data.selectedp1))
+            logging.debug('p2 value on fixp1p2: {}'.format(self.trial_data.selectedp2))
+
             if ~(self.trial_data.selectedp1 <= self.trial_data.selectedmaxvelocity <= self.trial_data.selectedp2):
                     self.max_position = velocity_profiler(self.trial_data, 'update')
                     self.VelocityCanvas.figure.get_axes()[0].get_children()[1].set_xdata(self.trial_data.selectedmaxvelocity)
+            logging.debug('maxvelocity on fixp1p2: {}'.format(self.trial_data.selectedmaxvelocity))
             self.VelocityCanvas.figure.gca().set_aspect('auto')
             self.VelocityCanvas.draw()
 
@@ -150,9 +155,12 @@ class MainPanel(wx.Panel):
             if self.selected_velocity is 'pyselect':  # will always happen first.
                 [fig, self.max_position] \
                     = velocity_profiler(self.trial_data, self.selected_velocity)
+                logging.debug('maxvelocity on pyselect: {}'.format(self.trial_data.selectedmaxvelocity))
+
                 self.VelocityCanvas.figure = fig
 
             elif self.selected_velocity is 'user':
+                logging.debug('maxvelocity on user select: {}'.format(self.trial_data.selectedmaxvelocity))
                 # maybe do this differently (outsource to a function?) . Consider this later.
                 self.VelocityCanvas.figure.get_axes()[0].get_children()[1].set_xdata(self.trial_data.selectedmaxvelocity)
                 self.selected_velocity = 'pyselect'
@@ -185,9 +193,11 @@ class MainPanel(wx.Panel):
             self.refresh()
 
     def set_settings(self, setting_name):
+        logging.info('setting_name set to %s \n', setting_name)
         self.InfoPanel.set_settings(setting_name)
 
     def set_exp(self, exp_name):
+        logging.info('exp_name set to %s \n', exp_name)
         if self.InfoPanel.setting.GetLabel() == 'None':
             self.warningmsg.ShowModal()
         else:
@@ -201,15 +211,20 @@ class MainPanel(wx.Panel):
             self.InfoPanel.set_exp(self.experiment_name, self.experiment)
 
     def set_trial_data(self, trial):
+        logging.info('=================== \n')
+        logging.info('trial set to %s \n ', trial)
+        logging.info('=================== \n')
         self.trial_data = self.experiment['output'].where(self.experiment['output'].trial_no == trial)
         self.trial_data.dropna(inplace=True)
         self.refresh()
 
     def refresh(self):
+        logging.info('REFRESH \n')
         self.__updatevelocityplot()
         self.__updatereachplot()
         self.InfoPanel.update()
         self.Fit()
+        self.__dolayout()
         self.Layout()
 
     def updateoutput(self):
@@ -221,7 +236,7 @@ class MainPanel(wx.Panel):
         self.experiment['output'].update(self.trial_data)
 
     def outputdata(self):
-        self.experiment['output'].to_csv(os.path.join(self.experiment_path, self.output_name), index=False)
+        self.experiment['output'].to_csv(os.path.join(self.experiment_path, self.output_name + '.csv'), index=False)
 
 
 
@@ -478,8 +493,14 @@ class PopupMenu(wx.MenuBar):
             self.savedsettings.Append(-1, item)
 
 def run():
+    logging.basicConfig(filename='setting/mylog.log', level=logging.DEBUG, format='%(asctime)s %(message)s')
+    logging.info('================= \n')
+    logging.info('Started')
     app = MyApp(False)
     app.MainLoop()
+    logging.info('================= \n')
+    logging.info('Finished')
+
 
 
 
