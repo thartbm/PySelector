@@ -2,7 +2,6 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="15bdcdf9-be6b-45b4-9487-2b4f4a2fdef8" name="Default" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
       <change beforePath="$PROJECT_DIR$/../../Personal_Projects/Web_Development/django/practice/.idea/workspace.xml" afterPath="$PROJECT_DIR$/../../Personal_Projects/Web_Development/django/practice/.idea/workspace.xml" />
     </list>
     <ignored path="$PROJECT_DIR$/.idea/httpRequests/" />
