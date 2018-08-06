@@ -142,9 +142,13 @@ class MainPanel(wx.Panel):
             self.selected_velocity = 'pyselect'
             self.VelocityCanvas.figure.get_axes()[0].get_children()[2].set_xdata(self.trial_data.selectedp1)
             self.VelocityCanvas.figure.get_axes()[0].get_children()[3].set_xdata(self.trial_data.selectedp2)
+            logging.debug('p1 value on fixp1p2: {}'.format(self.trial_data.selectedp1))
+            logging.debug('p2 value on fixp1p2: {}'.format(self.trial_data.selectedp2))
+
             if ~(self.trial_data.selectedp1 <= self.trial_data.selectedmaxvelocity <= self.trial_data.selectedp2):
                     self.max_position = velocity_profiler(self.trial_data, 'update')
                     self.VelocityCanvas.figure.get_axes()[0].get_children()[1].set_xdata(self.trial_data.selectedmaxvelocity)
+            logging.debug('maxvelocity on fixp1p2: {}'.format(self.trial_data.selectedmaxvelocity))
             self.VelocityCanvas.figure.gca().set_aspect('auto')
             self.VelocityCanvas.draw()
 
@@ -152,9 +156,12 @@ class MainPanel(wx.Panel):
             if self.selected_velocity is 'pyselect':  # will always happen first.
                 [fig, self.max_position] \
                     = velocity_profiler(self.trial_data, self.selected_velocity)
+                logging.debug('maxvelocity on pyselect: {}'.format(self.trial_data.selectedmaxvelocity))
+
                 self.VelocityCanvas.figure = fig
 
             elif self.selected_velocity is 'user':
+                logging.debug('maxvelocity on user select: {}'.format(self.trial_data.selectedmaxvelocity))
                 # maybe do this differently (outsource to a function?) . Consider this later.
                 self.VelocityCanvas.figure.get_axes()[0].get_children()[1].set_xdata(self.trial_data.selectedmaxvelocity)
                 self.selected_velocity = 'pyselect'
@@ -487,7 +494,6 @@ class PopupMenu(wx.MenuBar):
 
 def run():
     logging.basicConfig(filename='setting/mylog.log', level=logging.DEBUG, format='%(asctime)s %(message)s')
-    logging.getLogger().addHandler(logging.StreamHandler())
     logging.info('================= \n')
     logging.info('Started')
     app = MyApp(False)
