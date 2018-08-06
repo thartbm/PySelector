@@ -236,7 +236,7 @@ class MainPanel(wx.Panel):
         self.experiment['output'].update(self.trial_data)
 
     def outputdata(self):
-        self.experiment['output'].to_csv(os.path.join(self.experiment_path, self.output_name), index=False)
+        self.experiment['output'].to_csv(os.path.join(self.experiment_path, self.output_name + '.csv'), index=False)
 
 
 
