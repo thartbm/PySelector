@@ -24,7 +24,7 @@
     <SUITE FILE_PATH="coverage/PySelect_V1$app.coverage" NAME="app Coverage Results" MODIFIED="1509547819534" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/../Resources/wxPython 2.8 Cookbook/1780_Code/1780_01_Code/01" />
     <SUITE FILE_PATH="coverage/PySelect_V1$dataanalyzer.coverage" NAME="dataanalyzer Coverage Results" MODIFIED="1509807781584" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/database" />
     <SUITE FILE_PATH="coverage/PySelector$spammer.coverage" NAME="spammer Coverage Results" MODIFIED="1533243434712" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/../../Personal_Projects/Tengaged/Spamming" />
-    <SUITE FILE_PATH="coverage/PySelector$Main.coverage" NAME="Main Coverage Results" MODIFIED="1533584740728" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/PySelector$Main.coverage" NAME="Main Coverage Results" MODIFIED="1533584985276" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/PySelect_V1$startwindow.coverage" NAME="startwindow Coverage Results" MODIFIED="1509983387460" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/gui" />
     <SUITE FILE_PATH="coverage/PySelect_V1$mainwindow.coverage" NAME="mainwindow Coverage Results" MODIFIED="1510935693775" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/gui" />
     <SUITE FILE_PATH="coverage/PySelect_V1$test.coverage" NAME="test Coverage Results" MODIFIED="1509809943193" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/gui" />
@@ -102,8 +102,8 @@
       <file leaf-file-name="mainwindow.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/gui/mainwindow.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="269">
-              <caret line="238" column="100" lean-forward="false" selection-start-line="238" selection-start-column="100" selection-end-line="238" selection-end-column="100" />
+            <state relative-caret-position="177">
+              <caret line="226" column="25" lean-forward="false" selection-start-line="226" selection-start-column="25" selection-end-line="226" selection-end-column="25" />
               <folding>
                 <element signature="e#0#13#0" expanded="true" />
               </folding>
@@ -174,7 +174,6 @@
       <find>layout</find>
       <find>Layout</find>
       <find>insert</find>
-      <find>refresh</find>
       <find>size</find>
       <find>selected</find>
       <find>inter</find>
@@ -195,6 +194,7 @@
       <find>logging</find>
       <find>csv</find>
       <find>output</find>
+      <find>refresh</find>
     </findStrings>
     <replaceStrings>
       <replace>hand</replace>
@@ -779,8 +779,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/gui/mainwindow.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="269">
-          <caret line="238" column="100" lean-forward="false" selection-start-line="238" selection-start-column="100" selection-end-line="238" selection-end-column="100" />
+        <state relative-caret-position="177">
+          <caret line="226" column="25" lean-forward="false" selection-start-line="226" selection-start-column="25" selection-end-line="226" selection-end-column="25" />
           <folding>
             <element signature="e#0#13#0" expanded="true" />
           </folding>

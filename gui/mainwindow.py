@@ -9,8 +9,6 @@ import numpy as np
 import json
 from pathlib import Path
 import logging
-import datetime
-
 
 class MyApp(wx.App):
     def OnInit(self):
@@ -103,6 +101,7 @@ class MainPanel(wx.Panel):
         MainPanelSizer.Add(self.ButtonPanel, pos=(1, 0), span=(1, 1), flag = wx.GROW)
         MainPanelSizer.Add(self.InfoPanel, pos=(0, 0), span=(1, 1), flag=wx.ALIGN_CENTRE | wx.GROW)
         MainPanelSizer.AddGrowableCol(1)
+        MainPanelSizer.AddGrowableCol(0)
         MainPanelSizer.AddGrowableRow(0)
         MainPanelSizer.AddGrowableRow(1)
         self.SetSizerAndFit(MainPanelSizer)
@@ -225,6 +224,7 @@ class MainPanel(wx.Panel):
         self.__updatereachplot()
         self.InfoPanel.update()
         self.Fit()
+        self.__dolayout()
         self.Layout()
 
     def updateoutput(self):
